@@ -151,8 +151,9 @@ div,span{-webkit-font-smoothing:antialiased}
     <div style="font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem">Gray Matter</div>
     <h1>Know more.<br>Win everything.</h1>
   </div>
-  <button class="btn primary" style="padding:17px;font-size:16px" data-goto="s-host-setup">Host a game →</button>
-  <button class="btn ghost" style="padding:17px;font-size:16px;margin-top:12px" data-goto="s-join">Join a game</button>
+  <button class="btn primary" style="padding:17px;font-size:16px" id="btn-host">Host a game →</button>
+  <button class="btn ghost" style="padding:17px;font-size:16px;margin-top:12px" id="btn-join">Join a game</button>
+  <div id="init-error" style="display:none;margin-top:1rem;background:#ff4d4d22;border:1px solid #ff4d4d;border-radius:12px;padding:1rem;font-size:12px;color:#ff4d4d;font-weight:600;word-break:break-all"></div>
 </div>
 
 <!-- JOIN -->
@@ -179,9 +180,9 @@ div,span{-webkit-font-smoothing:antialiased}
 
     <span class="label">Round types</span>
     <div class="round-toggle-grid">
-      <div class="round-toggle sel" data-rt="trivia" onclick="toggleRT(this)"><div class="rt-icon">🧠</div><div class="rt-label">Trivia</div></div>
-      <div class="round-toggle sel" data-rt="mlt" onclick="toggleRT(this)"><div class="rt-icon">🫵</div><div class="rt-label">Most Likely To</div></div>
-      <div class="round-toggle sel" data-rt="wsi" onclick="toggleRT(this)"><div class="rt-icon">🤫</div><div class="rt-label">Who Said It?</div></div>
+      <div class="round-toggle sel" data-rt="trivia" data-toggle-rt="true"><div class="rt-icon">🧠</div><div class="rt-label">Trivia</div></div>
+      <div class="round-toggle sel" data-rt="mlt" data-toggle-rt="true"><div class="rt-icon">🫵</div><div class="rt-label">Most Likely To</div></div>
+      <div class="round-toggle sel" data-rt="wsi" data-toggle-rt="true"><div class="rt-icon">🤫</div><div class="rt-label">Who Said It?</div></div>
     </div>
 
     <div id="trivia-options">
@@ -190,17 +191,17 @@ div,span{-webkit-font-smoothing:antialiased}
 
     <span class="label">Difficulty</span>
     <div class="pill-row" id="diff-row">
-      <button class="pill sel" data-v="mixed" onclick="setDiff(this)">Mixed</button>
-      <button class="pill" data-v="medium" onclick="setDiff(this)">Medium</button>
-      <button class="pill" data-v="hard" onclick="setDiff(this)">Hard</button>
+      <button class="pill sel" data-v="mixed" data-set-diff="true">Mixed</button>
+      <button class="pill" data-v="medium" data-set-diff="true">Medium</button>
+      <button class="pill" data-v="hard" data-set-diff="true">Hard</button>
     </div>
 
     <span class="label">Questions per round</span>
     <div class="pill-row" id="cnt-row">
-      <button class="pill" data-v="5" onclick="setCnt(this)">5</button>
-      <button class="pill sel" data-v="10" onclick="setCnt(this)">10</button>
-      <button class="pill" data-v="15" onclick="setCnt(this)">15</button>
-      <button class="pill" data-v="20" onclick="setCnt(this)">20</button>
+      <button class="pill" data-v="5" data-set-cnt="true">5</button>
+      <button class="pill sel" data-v="10" data-set-cnt="true">10</button>
+      <button class="pill" data-v="15" data-set-cnt="true">15</button>
+      <button class="pill" data-v="20" data-set-cnt="true">20</button>
     </div>
     </div>
 
@@ -474,7 +475,10 @@ function initCats(){
   CATS.forEach(cat=>{
     const d=document.createElement('div');d.className='cat-card sel';
     d.innerHTML=`<div class="ci">${ICONS[cat]}</div><div class="cl">${cat}</div>`;
-    d.onclick=()=>{selCats.has(cat)?(selCats.size>1&&(selCats.delete(cat),d.classList.remove('sel'))):(selCats.add(cat),d.classList.add('sel'))};
+    d.addEventListener('click',()=>{
+      if(selCats.has(cat)){if(selCats.size>1){selCats.delete(cat);d.classList.remove('sel');}}
+      else{selCats.add(cat);d.classList.add('sel');}
+    });
     g.appendChild(d);
   });
 }
@@ -1044,7 +1048,6 @@ window.leaveRoom=async function(){
 initCats();
 
 // ── WIRE ALL BUTTONS ─────────────────────────────────────────────
-// Called after module init so all functions are in scope
 function wireButtons(){
   const wire=(id,fn)=>{const el=document.getElementById(id);if(el)el.onclick=fn;};
   wire('mlt-reveal-btn', ()=>hostMLTReveal());
@@ -1054,21 +1057,35 @@ function wireButtons(){
   wire('start-btn', ()=>hostStartGame());
   wire('wsi-submit-btn', ()=>submitMyWSIAnswer());
 
-  // nav buttons
-  document.querySelectorAll('[data-goto]').forEach(el=>{
-    el.onclick=()=>showScreen(el.dataset.goto);
-  });
-  document.querySelectorAll('[data-leave]').forEach(el=>{
-    el.onclick=()=>leaveRoom();
-  });
-  document.querySelectorAll('[data-create]').forEach(el=>{
-    el.onclick=()=>createRoom();
-  });
-  document.querySelectorAll('[data-join]').forEach(el=>{
-    el.onclick=()=>joinGame();
-  });
+  document.querySelectorAll('[data-goto]').forEach(el=>{el.onclick=()=>showScreen(el.dataset.goto);});
+  const btnHost=document.getElementById('btn-host');if(btnHost)btnHost.onclick=()=>showScreen('s-host-setup');
+  const btnJoin=document.getElementById('btn-join');if(btnJoin)btnJoin.onclick=()=>showScreen('s-join');
+  document.querySelectorAll('[data-leave]').forEach(el=>{el.onclick=()=>leaveRoom();});
+  document.querySelectorAll('[data-create]').forEach(el=>{el.onclick=()=>createRoom();});
+  document.querySelectorAll('[data-join]').forEach(el=>{el.onclick=()=>joinGame();});
+
+  // round type toggles
+  document.querySelectorAll('[data-toggle-rt]').forEach(el=>{el.onclick=()=>toggleRT(el);});
+
+  // difficulty pills
+  document.querySelectorAll('[data-set-diff]').forEach(el=>{el.onclick=()=>setDiff(el);});
+
+  // count pills
+  document.querySelectorAll('[data-set-cnt]').forEach(el=>{el.onclick=()=>setCnt(el);});
+
+  // cat cards (re-wire since initCats uses onclick directly — safe, same scope)
 }
 wireButtons();
+
+// catch init errors and show on screen
+window.addEventListener('error', function(e){
+  const el=document.getElementById('init-error');
+  if(el){el.style.display='block';el.textContent='Error: '+e.message+' ('+e.filename+':'+e.lineno+')';}
+});
+window.addEventListener('unhandledrejection', function(e){
+  const el=document.getElementById('init-error');
+  if(el){el.style.display='block';el.textContent='Promise error: '+(e.reason?.message||e.reason);}
+});
 </script>
 </body>
 </html>
