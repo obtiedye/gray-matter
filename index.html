@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gray Matter"/>
 <meta name="theme-color" content="#0f0f0f"/>
-<title>Gray Matter v7</title>
+<title>Gray Matter v8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -964,7 +964,7 @@ function renderWSIGuessing(item,room,playerNames){
     </div>
     ${revealed?'':current.author===myName
       ?'<div style="text-align:center;padding:1rem;font-size:14px;font-weight:700;color:var(--muted)">You wrote this one — sit back and watch 😏</div>'
-      :playerNames.filter(n=>n!==current.author||revealed).map((n,i)=>`
+      :playerNames.map((n,i)=>`
       <div class="wsi-answer-card${myGuess===n?' correct-reveal':''}" data-wsi-guess="${n}" id="wsi-gopt-${i}">
         <div class="wsi-answer-text" style="color:${TC[i%TC.length]}">${n}</div>
       </div>`).join('')}`;
