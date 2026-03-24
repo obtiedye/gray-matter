@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gray Matter"/>
 <meta name="theme-color" content="#0f0f0f"/>
-<title>Gray Matter v9</title>
+<title>Gray Matter v10</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -826,7 +826,8 @@ function renderMLT(item,room,playerNames,idx,total){
     <div id="mlt-options">${playerNames.map((n,i)=>{
       const voteCount=Object.values(votes).filter(v=>v===n).length;
       const pct=revealed?Math.round((voteCount/Math.max(Object.keys(votes).length,1))*100):0;
-      return `<div class="mlt-option${myVote===n?' voted':''}" data-mlt-name="${n}" id="mlt-opt-${i}">
+      const isWinner=revealed&&voteCount===Math.max(...playerNames.map(x=>Object.values(votes).filter(v=>v===x).length));
+      return `<div class="mlt-option${isWinner?' voted':!revealed&&myVote===n?' voted':''}" data-mlt-name="${n}" id="mlt-opt-${i}">
         <span class="mlt-option-name" style="color:${TC[i%TC.length]}">${n}</span>
         <div class="mlt-bar-wrap"><div class="mlt-bar" id="mlt-bar-${i}" style="width:${pct}%;background:${TC[i%TC.length]}"></div></div>
         <span class="mlt-count">${revealed?voteCount:''}</span>
