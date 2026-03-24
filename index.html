@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gray Matter"/>
 <meta name="theme-color" content="#0f0f0f"/>
-<title>Gray Matter v6</title>
+<title>Gray Matter v7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -425,10 +425,11 @@ const TRIVIA_Q=[
   {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"I don't practice Santeria,\nI ain't got no crystal ball...",q:"Who sang this and what's the song?",a:["Sublime — Santeria","311 — Amber","The Expendables — Bowl for Two","Slightly Stoopid — Wiseman"],correct:0,diff:"medium",fact:"Sublime's 'Santeria' (1996). Bradley Nowell died just two months before the album's release."},
   {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"What I got, you gotta get it put it in you\nReeling with the feeling, don't stop, continue...",q:"Who sang this and what's the song?",a:["Sublime — What I Got","311 — Down","Slightly Stoopid — Officer","Rebelution — Feeling Alright"],correct:0,diff:"medium",fact:"'What I Got' by Sublime — released posthumously in 1996."},
   {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"Red red wine, goes to my head\nMakes me forget that I\nStill need her so...",q:"Who made this song a massive reggae hit?",a:["UB40","Bob Marley","Jimmy Cliff","Steel Pulse"],correct:0,diff:"medium",fact:"Originally written by Neil Diamond in 1967. UB40's 1983 reggae version hit #1 worldwide."},
-  {cat:"Photo Round",icon:"📸",type:"image",q:"What species of whale is this?",a:["Humpback whale","Blue whale","Orca","Sperm whale"],correct:0,diff:"medium",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Humpback_Whales_NOAA.jpg",fact:"Humpbacks are known for acrobatic breaching and complex songs that travel thousands of miles."},
-  {cat:"Photo Round",icon:"📸",type:"image",q:"What San Diego landmark is shown here?",a:["Hotel del Coronado","USS Midway","Cabrillo Monument","Old Point Loma Lighthouse"],correct:3,diff:"hard",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/5/5d/Old_Point_Loma_Lighthouse_2013.jpg",fact:"The Old Point Loma Lighthouse was completed in 1855 — one of the oldest on the West Coast."},
-  {cat:"Photo Round",icon:"📸",type:"image",q:"What is this colorful marine creature?",a:["Mantis shrimp","Pistol shrimp","Peacock crab","Rainbow lobster"],correct:0,diff:"hard",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/a/a7/Odontodactylus_scyllarus.jpg",fact:"Mantis shrimp punch with the force of a bullet and see 16 types of color. Humans have 3."},
-  {cat:"Photo Round",icon:"📸",type:"image",q:"What type of animal is this, commonly seen near San Diego shores?",a:["California sea lion","Harbor seal","Elephant seal","Steller sea lion"],correct:0,diff:"medium",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/6/66/California_sea_lion_jan_2013.jpg",fact:"California sea lions are the ones barking on the docks — smart, social, often trained for military programs."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What species of whale is this?",a:["Humpback whale","Blue whale","Orca","Sperm whale"],correct:0,diff:"medium",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Humpback_Whales_NOAA.jpg/800px-Humpback_Whales_NOAA.jpg",fact:"Humpbacks are known for acrobatic breaching and complex songs that travel thousands of miles."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What San Diego landmark is shown here?",a:["Hotel del Coronado","USS Midway","Cabrillo Monument","Old Point Loma Lighthouse"],correct:3,diff:"hard",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Old_Point_Loma_Lighthouse_2013.jpg/800px-Old_Point_Loma_Lighthouse_2013.jpg",fact:"The Old Point Loma Lighthouse was completed in 1855 — one of the oldest on the West Coast."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What is this colorful marine creature?",a:["Mantis shrimp","Pistol shrimp","Peacock crab","Rainbow lobster"],correct:0,diff:"hard",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Odontodactylus_scyllarus.jpg/800px-Odontodactylus_scyllarus.jpg",fact:"Mantis shrimp punch with the force of a bullet and see 16 types of color. Humans have 3."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What type of animal is this, commonly seen near San Diego shores?",a:["California sea lion","Harbor seal","Elephant seal","Steller sea lion"],correct:0,diff:"medium",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/California_sea_lion_jan_2013.jpg/800px-California_sea_lion_jan_2013.jpg",fact:"California sea lions are the ones barking on the docks — smart, social, often trained for military programs."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What iconic San Diego building is this?",a:["Hotel del Coronado","US Grant Hotel","La Valencia Hotel","Horton Grand Hotel"],correct:0,diff:"medium",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Hotel_del_Coronado_2011.jpg/800px-Hotel_del_Coronado_2011.jpg",fact:"Hotel del Coronado opened in 1888 and hosted 14 US presidents. One of the last remaining Victorian beach resorts."},
   {cat:"Movies & TV",icon:"🎬",type:"standard",q:"What is the highest-grossing film of all time (unadjusted for inflation)?",a:["Avatar","Avengers: Endgame","Titanic","Star Wars: The Force Awakens"],correct:0,diff:"medium",fact:"James Cameron's Avatar (~$2.9B globally). Cameron also directed Titanic at #3 all-time."},
   {cat:"Movies & TV",icon:"🎬",type:"standard",q:"What film features the line 'You can't handle the truth!'?",a:["A Few Good Men","The Firm","Jerry Maguire","Philadelphia"],correct:0,diff:"medium",fact:"Jack Nicholson in A Few Good Men (1992). Tom Cruise never says 'I want the truth' — he says 'I want answers.'"},
   {cat:"Movies & TV",icon:"🎬",type:"standard",q:"Which actor has won the most Academy Awards for acting?",a:["Meryl Streep","Katharine Hepburn","Jack Nicholson","Daniel Day-Lewis"],correct:1,diff:"hard",fact:"Katharine Hepburn won 4 Best Actress Oscars. Streep and Day-Lewis each have 3."},
@@ -654,7 +655,7 @@ function renderScoreBar(players){
   if(players.length<=1){wrap.innerHTML='';return;}
   const sorted=[...players].sort((a,b)=>(b.score||0)-(a.score||0));
   wrap.innerHTML=`<div class="score-bar">${sorted.map((p,i)=>`
-    <div class="score-team${i===0?' active':''}">
+    <div class="score-team">
       <div class="sname">${p.name}</div>
       <div class="spts">${p.score||0}</div>
     </div>`).join('')}</div>`;
@@ -683,7 +684,7 @@ function renderTriviaQuestion(item,idx,total,room,playerNames){
   else if(q.cat==='Photo Round')body+=`<span class="round-type-badge rt-photo">📸 Photo</span>`;
   else body+=`<span class="round-type-badge rt-trivia">🧠 Trivia</span>`;
 
-  if(q.type==='image'&&q.imgUrl)body+=`<div class="img-card"><img src="${q.imgUrl}" loading="lazy" onerror="this.parentElement.style.display='none'"/></div>`;
+  if(q.type==='image'&&q.imgUrl)body+=`<div class="img-card"><img src="${q.imgUrl}" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='<div style=padding:2rem;text-align:center;font-size:13px;color:#777>📷 Image unavailable</div>'"/></div>`;
   else if(q.type==='lyrics'&&q.lyric)body+=`<div class="lyrics-card"><span class="lbl">🎵 Lyrics</span>${q.lyric.replace(/\n/g,'<br>')}</div>`;
   body+=`<div style="font-size:19px;font-weight:800;line-height:1.4;margin-bottom:1.1rem;letter-spacing:-.4px">${q.q}</div>`;
   document.getElementById('qbody').innerHTML=body;
