@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gray Matter"/>
 <meta name="theme-color" content="#0f0f0f"/>
-<title>Gray Matter</title>
+<title>Gray Matter v3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -955,7 +955,7 @@ function renderWSIGuessing(item,room,playerNames){
       ${revealed?`<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:8px">Written by ${current.author}</div>`:''}
     </div>
     ${revealed?'':playerNames.map((n,i)=>`
-      <div class="wsi-answer-card${myGuess===n?' correct-reveal':''}" onclick="submitWSIGuess('${n}')" id="wsi-gopt-${i}">
+      <div class="wsi-answer-card${myGuess===n?' correct-reveal':''}" data-wsi-guess="${n}" id="wsi-gopt-${i}">
         <div class="wsi-answer-text" style="color:${TC[i%TC.length]}">${n}</div>
       </div>`).join('')}`;
 
@@ -982,6 +982,16 @@ function renderWSIGuessing(item,room,playerNames){
     }
     wsiWait.style.display=myRole!=='host'?'block':'none';
     wsiWait.textContent='Waiting for host...';
+  }
+
+  // wire WSI guess clicks via delegation
+  const wsiGuessInner=document.getElementById('wsi-guess-inner');
+  if(wsiGuessInner){
+    wsiGuessInner.onclick=function(e){
+      const card=e.target.closest('[data-wsi-guess]');
+      if(!card||revealed)return;
+      submitWSIGuess(card.dataset.wsiGuess);
+    };
   }
 }
 
