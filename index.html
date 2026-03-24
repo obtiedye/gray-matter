@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gray Matter"/>
 <meta name="theme-color" content="#0f0f0f"/>
-<title>Gray Matter v13</title>
+<title>Gray Matter v14</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -472,23 +472,19 @@ function saveSession(){
 function clearSession(){
   try{localStorage.removeItem('gm_session');}catch(e){}
 }
-function checkRejoin(){
+async function checkRejoin(){
   try{
     const s=JSON.parse(localStorage.getItem('gm_session')||'null');
-    if(!s||!s.roomCode||!s.myName)return;
+    if(!s||!s.roomCode||!s.myName){clearSession();return;}
+    // verify room still exists before showing banner
+    const snap=await get(ref(db,`rooms/${s.roomCode}`));
+    if(!snap.exists()||snap.val().status==='ended'){clearSession();return;}
+    // room is live — show rejoin option
     document.getElementById('rejoin-text').textContent=`${s.myName} · Room ${s.roomCode}`;
     document.getElementById('rejoin-banner').style.display='block';
     document.getElementById('rejoin-btn').onclick=async()=>{
-      const snap=await get(ref(db,`rooms/${s.roomCode}`));
-      if(!snap.exists()||snap.val().status==='ended'){
-        clearSession();
-        document.getElementById('rejoin-banner').style.display='none';
-        alert('That room no longer exists.');
-        return;
-      }
       myName=s.myName;myRole=s.myRole;roomCode=s.roomCode;
       roomRef=ref(db,`rooms/${roomCode}`);
-      // re-add player in case they were removed
       await update(ref(db,`rooms/${roomCode}/players/${myName}`),{name:myName,score:snap.val().players?.[myName]?.score||0,role:myRole,joined:Date.now()});
       listenToRoom();
       if(myRole==='host')showScreen('s-lobby-host');
@@ -498,7 +494,7 @@ function checkRejoin(){
       clearSession();
       document.getElementById('rejoin-banner').style.display='none';
     };
-  }catch(e){}
+  }catch(e){clearSession();}
 }
 let selCats=new Set(CATS), selDiff='mixed', qCount=10;
 let activeRoundTypes=new Set(['trivia','mlt','wsi']);
