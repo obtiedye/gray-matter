@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gray Matter"/>
 <meta name="theme-color" content="#0f0f0f"/>
-<title>Gray Matter v15</title>
+<title>Gray Matter v16</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -75,7 +75,7 @@ h1{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.1}
 .score-team.active{background:var(--accent-bg);border-color:var(--accent)}
 .score-team .sname{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .score-team.active .sname{color:var(--accent)}
-.score-team .spts{font-size:22px;font-weight:900;letter-spacing:-1px}
+.score-team .spts{font-size:24px;font-weight:900;letter-spacing:-1px}
 .score-team.active .spts{color:var(--accent)}
 
 .lyrics-card{background:var(--surface2);border-radius:var(--radius);padding:1.1rem 1.25rem;margin-bottom:1rem;font-size:15px;line-height:1.9;color:var(--text);font-style:italic;border-left:3px solid var(--accent)}
@@ -640,6 +640,7 @@ function listenToRoom(){
 async function handleRoomUpdate(room){
   const players=Object.values(room.players||{}).sort((a,b)=>b.score-a.score);
   const playerNames=Object.keys(room.players||{});
+  renderScoreBar(players);
 
   // check if host left and promote if needed
   if(room.status==='playing'&&myRole!=='host'){
@@ -719,12 +720,14 @@ function handleGameUpdate(room){
 // ── SCORE BAR ────────────────────────────────────────────────────
 function renderScoreBar(players){
   const wrap=document.getElementById('score-bar-wrap');
-  if(players.length<=1){wrap.innerHTML='';return;}
+  if(!players||players.length===0){wrap.innerHTML='';return;}
   const sorted=[...players].sort((a,b)=>(b.score||0)-(a.score||0));
+  const leader=sorted[0];
   wrap.innerHTML=`<div class="score-bar">${sorted.map((p,i)=>`
-    <div class="score-team">
+    <div class="score-team${i===0&&players.length>1?' active':''}">
       <div class="sname">${p.name}</div>
       <div class="spts">${p.score||0}</div>
+      ${i===0&&players.length>1?'<div style="font-size:9px;font-weight:800;color:var(--accent);letter-spacing:.05em;margin-top:2px">LEAD</div>':''}
     </div>`).join('')}</div>`;
 }
 
