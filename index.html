@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gray Matter"/>
 <meta name="theme-color" content="#0f0f0f"/>
-<title>Gray Matter v11</title>
+<title>Gray Matter v12</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -151,6 +151,12 @@ div,span{-webkit-font-smoothing:antialiased}
     <div style="font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem">Gray Matter</div>
     <h1>Know more.<br>Win everything.</h1>
   </div>
+  <div id="rejoin-banner" style="display:none;background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem">
+    <div style="font-size:12px;font-weight:800;color:var(--accent);margin-bottom:4px">GAME IN PROGRESS</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px" id="rejoin-text"></div>
+    <button class="btn primary" style="margin:0;padding:12px" id="rejoin-btn">Rejoin game →</button>
+    <button class="btn ghost" style="margin-top:8px;padding:10px;font-size:13px" id="rejoin-dismiss">Dismiss</button>
+  </div>
   <button class="btn primary" style="padding:17px;font-size:16px" id="btn-host">Host a game →</button>
   <button class="btn ghost" style="padding:17px;font-size:16px;margin-top:12px" id="btn-join">Join a game</button>
   <div id="init-error" style="display:none;margin-top:1rem;background:#ff4d4d22;border:1px solid #ff4d4d;border-radius:12px;padding:1rem;font-size:12px;color:#ff4d4d;font-weight:600;word-break:break-all"></div>
@@ -205,7 +211,10 @@ div,span{-webkit-font-smoothing:antialiased}
     </div>
     </div>
 
-    <button class="btn primary" style="margin-top:1.5rem;padding:17px;font-size:16px" data-create="true">Create Room →</button>
+    <div style="background:rgba(255,150,0,0.08);border:1px solid rgba(255,150,0,0.25);border-radius:var(--radius);padding:.75rem 1rem;margin-top:1.25rem;font-size:12px;color:#ff9600;font-weight:600;line-height:1.6">
+      ⚠️ Firebase free tier — room data auto-deletes after 24hrs of inactivity. Perfect for bar nights!
+    </div>
+    <button class="btn primary" style="margin-top:.75rem;padding:17px;font-size:16px" data-create="true">Create Room →</button>
   </div>
 </div>
 
@@ -258,22 +267,34 @@ div,span{-webkit-font-smoothing:antialiased}
     <!-- host only next btn -->
     <button class="btn primary" id="next-btn" style="display:none;margin-top:1rem">Next →</button>
     <!-- player waiting indicator -->
-    <div id="player-answered-msg" style="display:none;margin-top:1rem;text-align:center;font-size:13px;font-weight:700;color:var(--muted)">Answer locked in — waiting for host...</div>
+    <div id="player-answered-msg" style="display:none;margin-top:1rem;text-align:center">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px" id="player-answered-text">Answer locked in ✓</div>
+      <div style="font-size:12px;color:#555;font-weight:600" id="player-answered-sub">Waiting for host to reveal answers...</div>
+    </div>
   </div>
 </div>
 
 <!-- WSI COLLECTION (each player on own phone) -->
 <div id="s-wsi-input" class="screen full">
   <div style="padding:1.5rem 1.25rem">
-    <div class="round-type-badge rt-wsi">🤫 Who Said It?</div>
-    <div style="font-size:19px;font-weight:800;line-height:1.4;letter-spacing:-.4px;margin:1rem 0" id="wsi-my-prompt"></div>
-    <p style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:1rem">Only you can see your answer. Everyone guesses after.</p>
-    <textarea class="input" id="wsi-my-input" placeholder="Type your answer..." rows="4" style="resize:none;line-height:1.5"></textarea>
-    <button class="btn primary" style="margin-top:1rem" id="wsi-submit-btn">Lock it in →</button>
-    <div id="wsi-submit-msg" style="display:none;margin-top:1rem;text-align:center">
-      <div style="font-size:32px;margin-bottom:.5rem">✅</div>
-      <p style="font-size:14px;font-weight:700;color:var(--muted)">Answer submitted! Waiting for everyone else...</p>
-      <div class="waiting-dots" style="justify-content:center"><div class="waiting-dot"></div><div class="waiting-dot"></div><div class="waiting-dot"></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="round-type-badge rt-wsi" style="margin:0">🤫 Who Said It?</div>
+      <span style="font-size:12px;font-weight:700;color:var(--muted)" id="wsi-collect-step"></span>
+    </div>
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:.85rem 1rem;margin-bottom:1rem;font-size:13px;color:var(--muted);font-weight:600;line-height:1.6">
+      📋 Everyone answers privately, then you all guess who wrote what. Points for correct guesses!
+    </div>
+    <div style="font-size:20px;font-weight:800;line-height:1.4;letter-spacing:-.4px;margin-bottom:1.25rem" id="wsi-my-prompt"></div>
+    <div id="wsi-input-area">
+      <p style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:.75rem">Your answer is private — no one else sees it until the reveal.</p>
+      <textarea class="input" id="wsi-my-input" placeholder="Type your answer..." rows="4" style="resize:none;line-height:1.5"></textarea>
+      <button class="btn primary" style="margin-top:1rem" id="wsi-submit-btn">Submit answer →</button>
+    </div>
+    <div id="wsi-submit-msg" style="display:none;margin-top:1rem;text-align:center;padding:1rem">
+      <div style="font-size:40px;margin-bottom:.75rem">✅</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:.5rem">Answer locked in!</div>
+      <p style="font-size:13px;font-weight:600;color:var(--muted)" id="wsi-waiting-count">Waiting for others...</p>
+      <div class="waiting-dots" style="justify-content:center;margin-top:1rem"><div class="waiting-dot"></div><div class="waiting-dot"></div><div class="waiting-dot"></div></div>
     </div>
   </div>
 </div>
@@ -315,9 +336,11 @@ div,span{-webkit-font-smoothing:antialiased}
 
 <!-- RESULTS -->
 <div id="s-results" class="screen full">
-  <div style="padding:2rem 1.25rem 1.5rem;border-bottom:1px solid var(--border)">
-    <div style="font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem">Gray Matter</div>
-    <h1>Game over.</h1>
+  <div id="winner-celebration" style="background:var(--accent);padding:2rem 1.25rem;text-align:center">
+    <div style="font-size:52px;margin-bottom:.5rem" id="results-trophy">🏆</div>
+    <div style="font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#0f0f0f;margin-bottom:.25rem">Winner</div>
+    <div style="font-size:32px;font-weight:900;color:#0f0f0f;letter-spacing:-1px" id="winner-name">—</div>
+    <div style="font-size:14px;font-weight:700;color:rgba(0,0,0,0.5);margin-top:.25rem" id="winner-score"></div>
   </div>
   <div style="padding:1.25rem">
     <div id="leaderboard"></div>
@@ -441,6 +464,42 @@ const ICONS={};TRIVIA_Q.forEach(q=>ICONS[q.cat]=q.icon);
 
 // ── STATE ────────────────────────────────────────────────────────
 let myName='', myRole='', roomCode='', roomRef=null, roomListener=null;
+
+// save/restore session for rejoin
+function saveSession(){
+  try{localStorage.setItem('gm_session',JSON.stringify({myName,myRole,roomCode}));}catch(e){}
+}
+function clearSession(){
+  try{localStorage.removeItem('gm_session');}catch(e){}
+}
+function checkRejoin(){
+  try{
+    const s=JSON.parse(localStorage.getItem('gm_session')||'null');
+    if(!s||!s.roomCode||!s.myName)return;
+    document.getElementById('rejoin-text').textContent=`${s.myName} · Room ${s.roomCode}`;
+    document.getElementById('rejoin-banner').style.display='block';
+    document.getElementById('rejoin-btn').onclick=async()=>{
+      const snap=await get(ref(db,`rooms/${s.roomCode}`));
+      if(!snap.exists()||snap.val().status==='ended'){
+        clearSession();
+        document.getElementById('rejoin-banner').style.display='none';
+        alert('That room no longer exists.');
+        return;
+      }
+      myName=s.myName;myRole=s.myRole;roomCode=s.roomCode;
+      roomRef=ref(db,`rooms/${roomCode}`);
+      // re-add player in case they were removed
+      await update(ref(db,`rooms/${roomCode}/players/${myName}`),{name:myName,score:snap.val().players?.[myName]?.score||0,role:myRole,joined:Date.now()});
+      listenToRoom();
+      if(myRole==='host')showScreen('s-lobby-host');
+      else showScreen('s-lobby-player');
+    };
+    document.getElementById('rejoin-dismiss').onclick=()=>{
+      clearSession();
+      document.getElementById('rejoin-banner').style.display='none';
+    };
+  }catch(e){}
+}
 let selCats=new Set(CATS), selDiff='mixed', qCount=10;
 let activeRoundTypes=new Set(['trivia','mlt','wsi']);
 let localStreak=0, myAnswered=false;
@@ -545,6 +604,7 @@ window.createRoom = async function(){
     currentPhase:'lobby',
   });
 
+  saveSession();
   listenToRoom();
   document.getElementById('lobby-code').textContent=roomCode;
   showScreen('s-lobby-host');
@@ -564,6 +624,7 @@ window.joinGame = async function(){
   myName=name;myRole='player';roomCode=code;
   roomRef=ref(db,`rooms/${code}`);
   await update(ref(db,`rooms/${code}/players/${name}`),{name,score:0,role:'player',joined:Date.now()});
+  saveSession();
   listenToRoom();
   document.getElementById('player-room-code').textContent=code;
   showScreen('s-lobby-player');
@@ -583,6 +644,21 @@ function listenToRoom(){
 function handleRoomUpdate(room){
   const players=Object.values(room.players||{}).sort((a,b)=>b.score-a.score);
   const playerNames=Object.keys(room.players||{});
+
+  // check if host left and promote if needed
+  if(room.status==='playing'&&myRole!=='host'){
+    const hostPlayer=Object.values(room.players||{}).find(p=>p.role==='host');
+    if(!hostPlayer&&players.length>0){
+      // host is gone — first player promotes themselves
+      const sorted=players.sort((a,b)=>a.joined-b.joined);
+      if(sorted[0].name===myName){
+        myRole='host';
+        saveSession();
+        await update(ref(db,`rooms/${roomCode}/players/${myName}`),{role:'host'});
+        alert('The host left — you are now the host!');
+      }
+    }
+  }
 
   // update lobby
   if(room.status==='lobby'){
@@ -705,7 +781,15 @@ function renderTriviaQuestion(item,idx,total,room,playerNames){
     pm.style.display='none';
   } else {
     nb.style.display='none';
-    pm.style.display=myAnswered?'block':'none';
+    if(myAnswered){
+      pm.style.display='block';
+      const answeredCount=Object.keys(room.answers||{}).length;
+      const totalCount=playerNames.length;
+      document.getElementById('player-answered-text').textContent='Answer locked in ✓';
+      document.getElementById('player-answered-sub').textContent=`${answeredCount} of ${totalCount} answered — waiting for host to reveal...`;
+    } else {
+      pm.style.display='none';
+    }
   }
 }
 
@@ -725,6 +809,8 @@ async function submitTriviaAnswer(ans,correctText,btn,grid,allAnswers){
   } else {
     nb.style.display='none';
     pm.style.display='block';
+    document.getElementById('player-answered-text').textContent='Answer locked in ✓';
+    document.getElementById('player-answered-sub').textContent='Waiting for host to reveal...';
   }
 }
 
@@ -897,16 +983,19 @@ window.hostMLTNext=async function(){await hostAdvance();}
 function renderWSICollect(item,room,playerNames){
   const wsiAnswers=room.wsiAnswers||{};
   const mySubmitted=!!wsiAnswers[myName];
+  const submittedCount=Object.keys(wsiAnswers).length;
+  const remaining=playerNames.filter(n=>!wsiAnswers[n]).length;
 
   showScreen('s-wsi-input');
   document.getElementById('wsi-my-prompt').textContent=item.prompt;
+  document.getElementById('wsi-collect-step').textContent=mySubmitted?`${submittedCount} of ${playerNames.length} answered`:'Type your answer privately';
 
   if(mySubmitted){
-    document.getElementById('wsi-my-input').style.display='none';
-    document.querySelector('#s-wsi-input .btn').style.display='none';
+    document.getElementById('wsi-input-area').style.display='none';
     document.getElementById('wsi-submit-msg').style.display='block';
-    const remaining=playerNames.filter(n=>!wsiAnswers[n]).length;
-    document.querySelector('#wsi-submit-msg p').textContent=`Answer submitted! ${remaining} player${remaining!==1?'s':''} still typing...`;
+    document.getElementById('wsi-waiting-count').textContent=remaining>0
+      ?`${submittedCount} of ${playerNames.length} answered — waiting for ${remaining} more...`
+      :'Everyone answered! Waiting for host to start guessing...';
   }
 
   // host: show "start guessing" button when all answered
@@ -925,11 +1014,15 @@ function renderWSICollect(item,room,playerNames){
 
 window.submitMyWSIAnswer=async function(){
   const val=document.getElementById('wsi-my-input').value.trim();
-  if(!val)return;
+  if(!val){
+    document.getElementById('wsi-my-input').style.borderColor='var(--red)';
+    document.getElementById('wsi-my-input').placeholder='Write something first!';
+    return;
+  }
   await set(ref(db,`rooms/${roomCode}/wsiAnswers/${myName}`),{author:myName,text:val});
-  document.getElementById('wsi-my-input').style.display='none';
-  document.querySelector('#s-wsi-input .btn.primary').style.display='none';
+  document.getElementById('wsi-input-area').style.display='none';
   document.getElementById('wsi-submit-msg').style.display='block';
+  document.getElementById('wsi-collect-step').textContent='Submitted!';
 }
 
 function renderWSIGuessing(item,room,playerNames){
@@ -1073,9 +1166,23 @@ async function endGame(room){
 
 function showResultsScreen(room){
   showScreen('s-results');
+  clearSession();
   const players=Object.values(room.players||{}).sort((a,b)=>b.score-a.score);
-  const max=players[0]?.score||1;
+  const winner=players[0];
   const ranks=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣'];
+  const trophies=['🏆','🥈','🥉'];
+
+  // winner banner
+  if(winner){
+    document.getElementById('winner-name').textContent=winner.name;
+    document.getElementById('winner-score').textContent=`${winner.score||0} points`;
+    // is it me?
+    if(winner.name===myName){
+      document.getElementById('results-trophy').textContent='🎉';
+      document.getElementById('winner-celebration').style.background='var(--accent)';
+    }
+  }
+
   document.getElementById('leaderboard').innerHTML=`
     <span class="label" style="margin-top:0">Final Scores</span>
     <div class="podium">
@@ -1096,11 +1203,13 @@ window.leaveRoom=async function(){
   } else if(roomRef&&myName){
     await remove(ref(db,`rooms/${roomCode}/players/${myName}`));
   }
+  clearSession();
   roomRef=null;roomCode='';myName='';myRole='';localStreak=0;myAnswered=false;
   showScreen('s-entry');
 }
 
 initCats();
+checkRejoin();
 
 // ── WIRE ALL BUTTONS ─────────────────────────────────────────────
 function wireButtons(){
