@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Gray Matter"/>
+<meta name="theme-color" content="#0f0f0f"/>
+<title>Gray Matter</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
+  --text:#f0f0f0;--muted:#777;--accent:#c8ff00;--accent-dim:#8aad00;
+  --accent-bg:rgba(200,255,0,0.07);--red:#ff4d4d;--red-bg:rgba(255,77,77,0.1);
+  --green:#39d98a;--green-bg:rgba(57,217,138,0.1);--radius:12px;--radius-lg:16px;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+.app{max-width:480px;margin:0 auto;padding-bottom:80px;min-height:100vh}
+.screen{display:none;padding:1.5rem 1.25rem}.screen.active{display:block}.screen.full{padding:0}
+h1{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.1}
+.label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:1.3rem;margin-bottom:6px;display:block}
+
+.btn{display:block;width:100%;padding:15px;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;text-align:center;border:none;margin-top:10px;transition:all 0.15s;font-family:'Inter',sans-serif;letter-spacing:-.2px}
+.btn:active{transform:scale(0.97)}
+.btn.primary{background:var(--accent);color:#0f0f0f}
+.btn.primary:active{background:var(--accent-dim)}
+.btn.ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn.danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,77,77,0.2)}
+.btn:disabled{opacity:0.3;cursor:default;transform:none}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem}
+
+.ans-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;text-align:left;font-size:15px;color:var(--text);width:100%;margin-bottom:8px;transition:all 0.15s;font-family:'Inter',sans-serif;font-weight:500;display:flex;align-items:center;gap:12px}
+.ans-btn:hover:not(:disabled){border-color:#555;background:var(--surface2)}
+.ans-btn:active:not(:disabled){transform:scale(0.99)}
+.ans-btn.correct{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.ans-btn.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.ans-btn.selected{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+.ans-btn:disabled{cursor:default;transform:none}
+.ans-letter{width:28px;height:28px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;color:var(--muted)}
+.ans-btn.correct .ans-letter{background:var(--green);border-color:var(--green);color:#0f0f0f}
+.ans-btn.wrong .ans-letter{background:var(--red);border-color:var(--red);color:#fff}
+.ans-btn.selected .ans-letter{background:var(--accent);border-color:var(--accent);color:#0f0f0f}
+
+.pill-row{display:flex;gap:8px;margin-top:.65rem}
+.pill{flex:1;padding:10px;border-radius:var(--radius);font-size:13px;cursor:pointer;text-align:center;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Inter',sans-serif;font-weight:700;transition:all 0.15s}
+.pill.sel{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+
+.input{width:100%;padding:12px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-family:'Inter',sans-serif;font-weight:500;outline:none;transition:border-color 0.15s}
+.input:focus{border-color:#555}
+.input-row{display:flex;gap:8px;align-items:center;margin-top:.75rem}
+.input-row .input{flex:1}
+.input-row .btn{width:auto;padding:12px 16px;margin:0}
+
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.75rem}
+.cat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem .75rem;cursor:pointer;text-align:center;transition:all 0.15s}
+.cat-card.sel{border-color:var(--accent);background:var(--accent-bg)}
+.cat-card.sel .cl{color:var(--accent)}
+.ci{font-size:20px;margin-bottom:4px}.cl{font-size:12px;font-weight:700;color:var(--muted)}
+
+.round-toggle-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:.75rem}
+.round-toggle{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem .5rem;cursor:pointer;text-align:center;transition:all 0.15s}
+.round-toggle.sel{border-color:var(--accent);background:var(--accent-bg)}
+.round-toggle.sel .rt-label{color:var(--accent)}
+.rt-icon{font-size:20px;margin-bottom:4px}.rt-label{font-size:11px;font-weight:700;color:var(--muted)}
+
+.progress-bar{background:var(--surface2);border-radius:99px;height:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .4s}
+
+.score-bar{display:flex;gap:6px;padding:.85rem 1.25rem;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto}
+.score-team{flex:1;min-width:60px;text-align:center;border-radius:var(--radius);padding:8px 6px;transition:all 0.2s;border:1px solid transparent}
+.score-team.active{background:var(--accent-bg);border-color:var(--accent)}
+.score-team .sname{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.score-team.active .sname{color:var(--accent)}
+.score-team .spts{font-size:22px;font-weight:900;letter-spacing:-1px}
+.score-team.active .spts{color:var(--accent)}
+
+.lyrics-card{background:var(--surface2);border-radius:var(--radius);padding:1.1rem 1.25rem;margin-bottom:1rem;font-size:15px;line-height:1.9;color:var(--text);font-style:italic;border-left:3px solid var(--accent)}
+.lyrics-card .lbl{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-style:normal;display:block;margin-bottom:8px}
+.img-card{border-radius:var(--radius);overflow:hidden;margin-bottom:1rem;background:var(--surface2);max-height:240px;display:flex;align-items:center;justify-content:center}
+.img-card img{width:100%;max-height:240px;object-fit:cover;display:block}
+.fact-box{background:var(--surface2);border-radius:var(--radius);padding:1rem 1.1rem;margin-top:1rem;font-size:13px;color:var(--muted);line-height:1.7;border-left:3px solid var(--accent)}
+
+.turn-badge{display:inline-flex;align-items:center;border-radius:99px;padding:5px 14px;font-size:12px;font-weight:800}
+.streak-badge{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--muted)}
+.streak-badge.hot{border-color:rgba(255,150,0,0.4);color:#ff9600;background:rgba(255,150,0,0.08)}
+
+.round-type-badge{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;margin-bottom:.6rem;letter-spacing:.04em;text-transform:uppercase}
+.rt-trivia{background:var(--accent-bg);color:var(--accent);border:1px solid rgba(200,255,0,0.2)}
+.rt-mlt{background:rgba(167,139,250,0.08);color:#a78bfa;border:1px solid rgba(167,139,250,0.2)}
+.rt-wsi{background:rgba(251,191,36,0.08);color:#fbbf24;border:1px solid rgba(251,191,36,0.2)}
+.rt-photo{background:rgba(77,159,255,0.08);color:#4d9fff;border:1px solid rgba(77,159,255,0.2)}
+.rt-music{background:rgba(57,217,138,0.08);color:var(--green);border:1px solid rgba(57,217,138,0.2)}
+
+.podium{display:flex;flex-direction:column;gap:8px;margin:1rem 0}
+.podium-row{display:flex;align-items:center;padding:13px 16px;border-radius:var(--radius-lg);border:1px solid var(--border);background:var(--surface)}
+.podium-row.first{border-color:var(--accent);background:var(--accent-bg)}
+.podium-rank{font-size:20px;width:32px}
+.podium-name{flex:1;font-size:16px;font-weight:800;margin:0 10px}
+.podium-row.first .podium-name{color:var(--accent)}
+.podium-score{font-size:15px;font-weight:700;color:var(--muted)}
+.podium-row.first .podium-score{color:var(--accent)}
+
+.icon-btn{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:6px 14px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif}
+.icon-btn:active{transform:scale(0.96)}
+
+/* LOBBY */
+.player-entry{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border-radius:var(--radius);margin-bottom:6px}
+.player-dot{width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:10px;flex-shrink:0}
+.room-code{font-size:56px;font-weight:900;letter-spacing:8px;color:var(--accent);text-align:center;margin:1rem 0}
+
+/* WSI */
+.wsi-answer-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:10px;cursor:pointer;transition:all 0.15s}
+.wsi-answer-card:active{transform:scale(0.98)}
+.wsi-answer-card.correct-reveal{border-color:var(--green);background:var(--green-bg)}
+.wsi-answer-card.wrong-reveal{opacity:.5}
+.wsi-answer-text{font-size:16px;font-weight:600}
+
+/* MLT */
+.mlt-option{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;transition:all 0.15s;font-family:'Inter',sans-serif}
+.mlt-option.voted{border-color:var(--accent);background:var(--accent-bg)}
+.mlt-option-name{font-size:15px;font-weight:700}
+.mlt-option.voted .mlt-option-name{color:var(--accent)}
+.mlt-bar-wrap{flex:1;height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;margin:0 12px}
+.mlt-bar{height:100%;border-radius:99px;background:var(--accent);width:0;transition:width .6s ease}
+.mlt-count{font-size:13px;font-weight:800;color:var(--muted);min-width:20px;text-align:right}
+
+.ai-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;padding:2rem}
+.ai-dots{display:flex;gap:8px;margin-bottom:1.5rem}
+.ai-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
+.ai-dot:nth-child(2){animation-delay:.2s}.ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,100%{opacity:.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1.2)}}
+
+.waiting-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;padding:2rem;text-align:center}
+.waiting-dots{display:flex;gap:8px;margin:1.5rem 0}
+.waiting-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:pulse 1.4s ease-in-out infinite}
+.waiting-dot:nth-child(2){animation-delay:.2s}.waiting-dot:nth-child(3){animation-delay:.4s}
+
+div,span{-webkit-font-smoothing:antialiased}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ENTRY: join or host -->
+<div id="s-entry" class="screen active" style="padding-top:3rem">
+  <div style="margin-bottom:2rem">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem">Gray Matter</div>
+    <h1>Know more.<br>Win everything.</h1>
+  </div>
+  <button class="btn primary" style="padding:17px;font-size:16px" data-goto="s-host-setup">Host a game →</button>
+  <button class="btn ghost" style="padding:17px;font-size:16px;margin-top:12px" data-goto="s-join">Join a game</button>
+</div>
+
+<!-- JOIN -->
+<div id="s-join" class="screen">
+  <button class="icon-btn" style="margin-bottom:1.5rem" data-goto="s-entry">← Back</button>
+  <h1 style="margin-bottom:1.5rem">Join game</h1>
+  <span class="label" style="margin-top:0">Your name</span>
+  <input class="input" id="join-name" placeholder="Enter your name..." maxlength="18"/>
+  <span class="label">Room code</span>
+  <input class="input" id="join-code" placeholder="e.g. WKPQ" maxlength="4" style="text-transform:uppercase;font-size:24px;font-weight:800;letter-spacing:4px;text-align:center"/>
+  <button class="btn primary" style="margin-top:1.5rem;padding:17px" data-join="true">Join →</button>
+  <div id="join-error" style="color:var(--red);font-size:13px;font-weight:600;margin-top:.75rem;text-align:center;display:none"></div>
+</div>
+
+<!-- HOST SETUP -->
+<div id="s-host-setup" class="screen full">
+  <div style="padding:1.5rem 1.25rem">
+    <button class="icon-btn" style="margin-bottom:1.5rem" data-goto="s-entry">← Back</button>
+    <h1 style="margin-bottom:.25rem">Host setup</h1>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1.25rem">Configure the game, then share the room code with players.</p>
+
+    <span class="label" style="margin-top:0">Your name</span>
+    <input class="input" id="host-name" placeholder="Enter your name..." maxlength="18"/>
+
+    <span class="label">Round types</span>
+    <div class="round-toggle-grid">
+      <div class="round-toggle sel" data-rt="trivia" onclick="toggleRT(this)"><div class="rt-icon">🧠</div><div class="rt-label">Trivia</div></div>
+      <div class="round-toggle sel" data-rt="mlt" onclick="toggleRT(this)"><div class="rt-icon">🫵</div><div class="rt-label">Most Likely To</div></div>
+      <div class="round-toggle sel" data-rt="wsi" onclick="toggleRT(this)"><div class="rt-icon">🤫</div><div class="rt-label">Who Said It?</div></div>
+    </div>
+
+    <div id="trivia-options">
+    <span class="label">Categories</span>
+    <div class="cat-grid" id="cat-grid"></div>
+
+    <span class="label">Difficulty</span>
+    <div class="pill-row" id="diff-row">
+      <button class="pill sel" data-v="mixed" onclick="setDiff(this)">Mixed</button>
+      <button class="pill" data-v="medium" onclick="setDiff(this)">Medium</button>
+      <button class="pill" data-v="hard" onclick="setDiff(this)">Hard</button>
+    </div>
+
+    <span class="label">Questions per round</span>
+    <div class="pill-row" id="cnt-row">
+      <button class="pill" data-v="5" onclick="setCnt(this)">5</button>
+      <button class="pill sel" data-v="10" onclick="setCnt(this)">10</button>
+      <button class="pill" data-v="15" onclick="setCnt(this)">15</button>
+      <button class="pill" data-v="20" onclick="setCnt(this)">20</button>
+    </div>
+    </div>
+
+    <button class="btn primary" style="margin-top:1.5rem;padding:17px;font-size:16px" data-create="true">Create Room →</button>
+  </div>
+</div>
+
+<!-- LOBBY (host) -->
+<div id="s-lobby-host" class="screen full">
+  <div style="padding:1.5rem 1.25rem">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem">Room code — share this</div>
+    <div class="room-code" id="lobby-code">----</div>
+    <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:1.5rem">Everyone goes to the same URL and enters this code</p>
+    <span class="label" style="margin-top:0">Players in room</span>
+    <div id="lobby-players" style="margin-top:.5rem"></div>
+    <button class="btn primary" style="margin-top:1.5rem;padding:17px;font-size:16px" id="start-btn"  disabled>Waiting for players...</button>
+    <button class="btn ghost" style="margin-top:8px" data-leave="true">Cancel</button>
+  </div>
+</div>
+
+<!-- LOBBY (player) -->
+<div id="s-lobby-player" class="screen full">
+  <div class="waiting-screen">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem">You're in!</div>
+    <div style="font-size:48px;font-weight:900;letter-spacing:4px;color:var(--text);margin-bottom:.5rem" id="player-room-code">----</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:1rem">Waiting for the host to start...</p>
+    <div class="waiting-dots"><div class="waiting-dot"></div><div class="waiting-dot"></div><div class="waiting-dot"></div></div>
+    <div id="lobby-player-list" style="margin-top:1rem;width:100%"></div>
+    <button class="btn ghost" style="margin-top:1.5rem" data-leave="true">Leave room</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="s-game" class="screen full">
+  <div id="score-bar-wrap"></div>
+  <div style="padding:.9rem 1.25rem 0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+      <button class="icon-btn" data-leave="true">← Leave</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="streak-badge" id="streak-badge" style="display:none">🔥 <span id="streak-num">0</span></span>
+        <span style="font-size:12px;font-weight:700;color:var(--muted)" id="qnum"></span>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.8rem;margin-bottom:.2rem">
+      <span id="turn-badge-wrap"></span>
+      <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase" id="qcat"></span>
+    </div>
+  </div>
+  <div style="padding:.75rem 1.25rem 0">
+    <div id="qbody"></div>
+    <div id="ans-grid"></div>
+    <div id="fact-area"></div>
+    <!-- host only next btn -->
+    <button class="btn primary" id="next-btn" style="display:none;margin-top:1rem">Next →</button>
+    <!-- player waiting indicator -->
+    <div id="player-answered-msg" style="display:none;margin-top:1rem;text-align:center;font-size:13px;font-weight:700;color:var(--muted)">Answer locked in — waiting for host...</div>
+  </div>
+</div>
+
+<!-- WSI COLLECTION (each player on own phone) -->
+<div id="s-wsi-input" class="screen full">
+  <div style="padding:1.5rem 1.25rem">
+    <div class="round-type-badge rt-wsi">🤫 Who Said It?</div>
+    <div style="font-size:19px;font-weight:800;line-height:1.4;letter-spacing:-.4px;margin:1rem 0" id="wsi-my-prompt"></div>
+    <p style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:1rem">Only you can see your answer. Everyone guesses after.</p>
+    <textarea class="input" id="wsi-my-input" placeholder="Type your answer..." rows="4" style="resize:none;line-height:1.5"></textarea>
+    <button class="btn primary" style="margin-top:1rem" id="wsi-submit-btn">Lock it in →</button>
+    <div id="wsi-submit-msg" style="display:none;margin-top:1rem;text-align:center">
+      <div style="font-size:32px;margin-bottom:.5rem">✅</div>
+      <p style="font-size:14px;font-weight:700;color:var(--muted)">Answer submitted! Waiting for everyone else...</p>
+      <div class="waiting-dots" style="justify-content:center"><div class="waiting-dot"></div><div class="waiting-dot"></div><div class="waiting-dot"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WSI GUESSING (host-driven, everyone sees on own phone) -->
+<div id="s-wsi-guess" class="screen full">
+  <div style="padding:1.5rem 1.25rem">
+    <div class="round-type-badge rt-wsi">🤫 Who Said It?</div>
+    <div style="font-size:13px;color:var(--muted);font-weight:700;margin:.5rem 0 .4rem">The prompt</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:1rem" id="wsi-guess-prompt"></div>
+    <div id="wsi-guess-inner"></div>
+    <button class="btn primary" id="wsi-next-btn" style="display:none;margin-top:1rem" >Next Answer →</button>
+    <button class="btn ghost" id="wsi-done-btn" style="display:none;margin-top:10px" >Finish Round →</button>
+    <div id="wsi-waiting-msg" style="display:none;margin-top:1rem;text-align:center;font-size:13px;font-weight:700;color:var(--muted)">Answer locked in — waiting for host...</div>
+  </div>
+</div>
+
+<!-- MLT -->
+<div id="s-mlt" class="screen full">
+  <div style="padding:1.5rem 1.25rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="round-type-badge rt-mlt" style="margin:0">🫵 Most Likely To</div>
+      <span style="font-size:12px;font-weight:700;color:var(--muted)" id="mlt-progress"></span>
+    </div>
+    <div id="mlt-inner"></div>
+    <button class="btn primary" id="mlt-reveal-btn" style="display:none;margin-top:1rem" >Reveal →</button>
+    <button class="btn primary" id="mlt-next-btn" style="display:none;margin-top:1rem" >Next →</button>
+    <div id="mlt-voted-msg" style="display:none;margin-top:1rem;text-align:center;font-size:13px;font-weight:700;color:var(--muted)">Voted! Waiting for host to reveal...</div>
+  </div>
+</div>
+
+<!-- AI LOADING -->
+<div id="s-ai" class="screen full">
+  <div class="ai-screen">
+    <div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
+    <p id="ai-msg">Building your game...</p>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="s-results" class="screen full">
+  <div style="padding:2rem 1.25rem 1.5rem;border-bottom:1px solid var(--border)">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem">Gray Matter</div>
+    <h1>Game over.</h1>
+  </div>
+  <div style="padding:1.25rem">
+    <div id="leaderboard"></div>
+    <button class="btn primary" style="margin-top:1.25rem" data-leave="true">Play again →</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAzEFEZKeOjqG6xhFicvjtYVeHQChK78nc",
+  authDomain: "gray-matter-efe69.firebaseapp.com",
+  databaseURL: "https://gray-matter-efe69-default-rtdb.firebaseio.com",
+  projectId: "gray-matter-efe69",
+  storageBucket: "gray-matter-efe69.firebasestorage.app",
+  messagingSenderId: "324376672521",
+  appId: "1:324376672521:web:69842f179dbcebb4b33bd8",
+  measurementId: "G-8751DM15PQ"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+
+// ── CONSTANTS ────────────────────────────────────────────────────
+const TC=['#4d9fff','#ff6b6b','#a78bfa','#fbbf24','#39d98a','#ff9600'];
+const LETTERS=['A','B','C','D'];
+
+const MLT_PROMPTS=[
+  "most likely to argue with a stranger on the internet",
+  "most likely to accidentally become famous",
+  "most likely to eat something they found on the ground",
+  "most likely to cry at a commercial",
+  "most likely to start a cult",
+  "most likely to survive a zombie apocalypse",
+  "most likely to get 86'd from a bar",
+  "most likely to be on a reality TV show",
+  "most likely to quit their job and move to a different country",
+  "most likely to get lost with GPS",
+  "most likely to befriend a wild animal",
+  "most likely to accidentally go viral",
+  "most likely to write a strongly-worded Yelp review",
+  "most likely to have an elaborate conspiracy theory they half-believe",
+  "most likely to be the last one to find out about major news",
+];
+
+const WSI_PROMPTS=[
+  "What's your most unhinged food opinion?",
+  "What's the most delusional thing you still believe about yourself?",
+  "What's a rule you consistently break and feel zero guilt about?",
+  "Describe your ideal Sunday in exactly five words.",
+  "What's your villain origin story?",
+  "What's a hill you would absolutely die on?",
+  "What's something everyone seems to love that you genuinely don't get?",
+  "What's your hottest take about San Diego?",
+  "What's your actual relationship with exercise?",
+  "What food would you eat exclusively for a month if you had to?",
+  "Describe yourself in three words your enemies would use.",
+  "What's the most chaotic life decision that actually worked out?",
+  "What's your most embarrassing recurring habit?",
+];
+
+const TRIVIA_Q=[
+  {cat:"Outer Space",icon:"🪐",type:"standard",q:"What is the largest known star by radius?",a:["UY Scuti","Betelgeuse","VY Canis Majoris","Eta Carinae"],correct:0,diff:"hard",fact:"UY Scuti is ~1,700x the radius of our Sun — if placed here its surface would extend past Jupiter's orbit."},
+  {cat:"Outer Space",icon:"🪐",type:"standard",q:"Roughly how long does sunlight take to reach Earth?",a:["8 minutes","3 seconds","2 hours","45 minutes"],correct:0,diff:"medium",fact:"About 8 min 20 sec. The Sun you see is always slightly in the past."},
+  {cat:"Outer Space",icon:"🪐",type:"standard",q:"Which planet currently has the most confirmed moons?",a:["Saturn","Jupiter","Uranus","Neptune"],correct:0,diff:"medium",fact:"Saturn edged past Jupiter with 146+ confirmed moons as of recent surveys."},
+  {cat:"Outer Space",icon:"🪐",type:"standard",q:"What is a 'rogue planet'?",a:["A planet not orbiting any star","A planet with reverse rotation","A moon that escaped its orbit","A dwarf planet beyond Neptune"],correct:0,diff:"hard",fact:"Rogue planets drift alone through interstellar space. The Milky Way may have billions of them."},
+  {cat:"Outer Space",icon:"🪐",type:"standard",q:"What spacecraft was first to leave our solar system?",a:["Voyager 1","Pioneer 10","New Horizons","Voyager 2"],correct:0,diff:"hard",fact:"Voyager 1 crossed into interstellar space in 2012. Launched in 1977, it's the most distant human-made object."},
+  {cat:"Outer Space",icon:"🪐",type:"standard",q:"What percentage of the universe is ordinary matter?",a:["About 5%","About 25%","About 50%","About 75%"],correct:0,diff:"hard",fact:"~5% ordinary matter, ~27% dark matter, ~68% dark energy — both still largely mysterious."},
+  {cat:"Outer Space",icon:"🪐",type:"standard",q:"What causes a lunar eclipse?",a:["Earth passes between Sun and Moon","Moon passes between Sun and Earth","Sun passes between Earth and Moon","Asteroid shadow"],correct:0,diff:"medium",fact:"Earth's shadow falls on the Moon. A total lunar eclipse turns it deep red — the blood moon effect."},
+  {cat:"Wildlife",icon:"🦁",type:"standard",q:"Which animal has the most powerful bite force?",a:["Saltwater crocodile","Great white shark","Hippopotamus","Spotted hyena"],correct:0,diff:"hard",fact:"Saltwater crocs exceed 3,700 PSI — 10x stronger than a lion."},
+  {cat:"Wildlife",icon:"🦁",type:"standard",q:"What is a group of flamingos called?",a:["A flamboyance","A colony","A bouquet","A bloom"],correct:0,diff:"medium",fact:"A flamboyance. Their pink color comes from carotenoid pigments in the algae and crustaceans they eat."},
+  {cat:"Wildlife",icon:"🦁",type:"standard",q:"How many hearts does an octopus have?",a:["Three","Two","One","Four"],correct:0,diff:"medium",fact:"Two branchial hearts pump blood through the gills; one systemic heart pumps it to the body. Blood is blue."},
+  {cat:"Wildlife",icon:"🦁",type:"standard",q:"Which bird has the largest wingspan of any living bird?",a:["Wandering albatross","California condor","Dalmatian pelican","Andean condor"],correct:0,diff:"hard",fact:"Wandering albatross can reach nearly 12 feet tip-to-tip and spend years at sea without touching land."},
+  {cat:"Wildlife",icon:"🦁",type:"standard",q:"What makes tardigrades remarkable?",a:["They survive in outer space","They have no DNA","They live 1,000+ years","They regenerate lost limbs"],correct:0,diff:"medium",fact:"Water bears survive extreme radiation, the vacuum of space, boiling water, and near-absolute zero."},
+  {cat:"Wildlife",icon:"🦁",type:"standard",q:"How do dolphins sleep?",a:["One brain hemisphere at a time","They don't sleep","Fully unconscious like humans","Floating motionless"],correct:0,diff:"hard",fact:"Unihemispheric sleep — half the brain rests while the other stays alert to surface for air."},
+  {cat:"Wildlife",icon:"🦁",type:"standard",q:"Which land animal runs the fastest?",a:["Cheetah","Pronghorn antelope","Lion","Springbok"],correct:0,diff:"medium",fact:"Cheetahs hit ~70 mph in short bursts. The pronghorn is fastest over sustained distances."},
+  {cat:"Ocean & Marine",icon:"🌊",type:"standard",q:"What percentage of Earth's oceans remains unexplored?",a:["About 80%","About 30%","About 50%","About 95%"],correct:0,diff:"medium",fact:"We've mapped more of Mars than our own ocean floor. The deep sea is still mostly a mystery."},
+  {cat:"Ocean & Marine",icon:"🌊",type:"standard",q:"How deep is the Mariana Trench approximately?",a:["36,000 feet","15,000 feet","60,000 feet","20,000 feet"],correct:0,diff:"hard",fact:"~36,089 feet — deeper than Everest is tall. Only a handful of humans have ever visited the bottom."},
+  {cat:"Ocean & Marine",icon:"🌊",type:"standard",q:"What is a 'blue hole'?",a:["A deep underwater sinkhole","A bioluminescent zone","A cold-water upwelling","A type of coral formation"],correct:0,diff:"hard",fact:"Underwater sinkholes. The Great Blue Hole off Belize is 984 feet across and 407 feet deep."},
+  {cat:"Ocean & Marine",icon:"🌊",type:"standard",q:"Which ocean current moderates the climate of Northern Europe?",a:["Gulf Stream","Humboldt Current","Kuroshio Current","Benguela Current"],correct:0,diff:"hard",fact:"The Gulf Stream carries warm water northward, keeping Western Europe much warmer than expected."},
+  {cat:"Science & Tech",icon:"🔬",type:"standard",q:"What is quantum entanglement?",a:["Two particles sharing quantum states regardless of distance","Particles moving faster than light","Atoms becoming invisible at low temp","A superposition of parallel universes"],correct:0,diff:"hard",fact:"Einstein called it 'spooky action at a distance.' Measuring one entangled particle instantly affects the other."},
+  {cat:"Science & Tech",icon:"🔬",type:"standard",q:"What is CRISPR?",a:["A gene-editing tool","A type of protein crystal","A quantum computing algorithm","A new element"],correct:0,diff:"hard",fact:"CRISPR-Cas9 can cut and edit DNA with precision. It won the 2020 Nobel Prize in Chemistry."},
+  {cat:"Science & Tech",icon:"🔬",type:"standard",q:"What is the most abundant gas in Earth's atmosphere?",a:["Nitrogen","Oxygen","Carbon dioxide","Argon"],correct:0,diff:"medium",fact:"Nitrogen is ~78%. Oxygen is ~21%. CO2 is under 0.05% — small but mighty climate-wise."},
+  {cat:"Science & Tech",icon:"🔬",type:"standard",q:"How many bones are in the adult human body?",a:["206","212","186","250"],correct:0,diff:"medium",fact:"Babies are born with ~270 bones — many fuse as we grow. Adults settle at 206."},
+  {cat:"Food & Drink",icon:"🍺",type:"standard",q:"What does IBU measure in beer?",a:["Bitterness","Alcohol content","Color","Carbonation"],correct:0,diff:"medium",fact:"International Bitterness Units measure iso-alpha acids from hops. Light lagers: ~8 IBU. West Coast IPAs: 100+."},
+  {cat:"Food & Drink",icon:"🍺",type:"standard",q:"What is the Maillard reaction?",a:["Browning of food when cooked","Fermentation in bread","Caramelization of sugar","Milk souring"],correct:0,diff:"hard",fact:"Amino acids + sugars reacting with heat — responsible for seared steak, toast crust, and roasted coffee."},
+  {cat:"Food & Drink",icon:"🍺",type:"standard",q:"What grain must bourbon be at least 51% made from?",a:["Corn","Rye","Barley","Wheat"],correct:0,diff:"medium",fact:"By US law, bourbon must be at least 51% corn, aged in new charred oak."},
+  {cat:"Food & Drink",icon:"🍺",type:"standard",q:"What style of beer is characterized by hazy appearance and low bitterness?",a:["New England IPA","West Coast IPA","Double IPA","Session IPA"],correct:0,diff:"medium",fact:"NEIPAs use late-addition hops and specific yeasts to create a soft, fruity, low-bitterness profile."},
+  {cat:"History & World",icon:"🌍",type:"standard",q:"Which ancient wonder of the world still stands?",a:["Great Pyramid of Giza","Colossus of Rhodes","Lighthouse of Alexandria","Hanging Gardens of Babylon"],correct:0,diff:"medium",fact:"The Great Pyramid is the only surviving ancient wonder — tallest man-made structure for over 3,800 years."},
+  {cat:"History & World",icon:"🌍",type:"standard",q:"How long did the Hundred Years' War actually last?",a:["116 years","100 years","87 years","143 years"],correct:0,diff:"medium",fact:"1337 to 1453 — that's 116 years. No refunds on the extra 16."},
+  {cat:"History & World",icon:"🌍",type:"standard",q:"What country has the most natural lakes?",a:["Canada","Russia","Finland","USA"],correct:0,diff:"hard",fact:"Canada has ~879,800 lakes larger than 10 sq km — more than all other countries combined."},
+  {cat:"History & World",icon:"🌍",type:"standard",q:"What was the first country to grant women the right to vote?",a:["New Zealand","USA","UK","Australia"],correct:0,diff:"hard",fact:"New Zealand granted women voting rights in 1893, the first self-governing country to do so."},
+  {cat:"San Diego",icon:"🌴",type:"standard",q:"What year was the first Spanish mission in San Diego founded?",a:["1769","1821","1848","1850"],correct:0,diff:"hard",fact:"Mission San Diego de Alcalá was founded July 16, 1769 by Father Junípero Serra."},
+  {cat:"San Diego",icon:"🌴",type:"standard",q:"What is the name of San Diego's famous 1,200-acre urban park?",a:["Balboa Park","Mission Bay Park","Presidio Park","Cabrillo National Monument"],correct:0,diff:"medium",fact:"Balboa Park is one of the largest urban cultural parks in the US."},
+  {cat:"San Diego",icon:"🌴",type:"standard",q:"What is the iconic aircraft carrier museum in San Diego Harbor?",a:["USS Midway","USS Nimitz","USS Ronald Reagan","USS Enterprise"],correct:0,diff:"medium",fact:"The USS Midway Museum is the most visited naval ship museum in the world."},
+  {cat:"San Diego",icon:"🌴",type:"standard",q:"Which brewery helped define the West Coast IPA style?",a:["Stone Brewing","Karl Strauss","Ballast Point","Green Flash"],correct:0,diff:"hard",fact:"Stone Brewing, founded in San Marcos in 1996, was a major force defining the bitter West Coast IPA."},
+  {cat:"San Diego",icon:"🌴",type:"standard",q:"What is the submarine canyon just offshore of La Jolla called?",a:["Scripps Canyon","La Jolla Canyon","Coronado Canyon","Point Loma Canyon"],correct:0,diff:"hard",fact:"Scripps Canyon plunges nearly 1,000 feet just offshore and is a major marine research hotspot."},
+  {cat:"San Diego",icon:"🌴",type:"standard",q:"What year did the Chargers officially leave San Diego?",a:["2017","2015","2019","2016"],correct:0,diff:"medium",fact:"The Chargers announced their move to LA in January 2017. Still a sore subject."},
+  {cat:"San Diego",icon:"🌴",type:"standard",q:"San Diego County has roughly how many miles of coastline?",a:["70 miles","30 miles","100 miles","15 miles"],correct:0,diff:"hard",fact:"~70 miles of coastline from Oceanside all the way to the Mexican border."},
+  {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"No woman, no cry\nNo woman, no cry...",q:"Who sang this and what's the song?",a:["Bob Marley — No Woman No Cry","Peter Tosh — Stepping Razor","Jimmy Cliff — Many Rivers to Cross","Burning Spear — Marcus Garvey"],correct:0,diff:"medium",fact:"Despite the name, it's comforting — 'no, woman, don't cry.' From Marley's 1974 album Natty Dread."},
+  {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"Is this the real life?\nIs this just fantasy?\nCaught in a landslide,\nNo escape from reality...",q:"Who sang this and what's the song?",a:["Queen — Bohemian Rhapsody","David Bowie — Space Oddity","Led Zeppelin — Stairway to Heaven","Elton John — Rocket Man"],correct:0,diff:"medium",fact:"'Bohemian Rhapsody' by Queen (1975). Freddie Mercury wrote it as a mock-operatic rock ballad."},
+  {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"Rollin' down the street,\nsmokin' indo,\nsippin' on gin and juice...",q:"Who sang this and what's the song?",a:["Snoop Dogg — Gin and Juice","Dr. Dre — Nuthin' But a G Thang","Ice Cube — It Was a Good Day","Warren G — Regulate"],correct:0,diff:"medium",fact:"Snoop Dogg's 'Gin and Juice' (1993). Smooth synths, P-Funk samples, classic West Coast G-Funk."},
+  {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"I don't practice Santeria,\nI ain't got no crystal ball...",q:"Who sang this and what's the song?",a:["Sublime — Santeria","311 — Amber","The Expendables — Bowl for Two","Slightly Stoopid — Wiseman"],correct:0,diff:"medium",fact:"Sublime's 'Santeria' (1996). Bradley Nowell died just two months before the album's release."},
+  {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"What I got, you gotta get it put it in you\nReeling with the feeling, don't stop, continue...",q:"Who sang this and what's the song?",a:["Sublime — What I Got","311 — Down","Slightly Stoopid — Officer","Rebelution — Feeling Alright"],correct:0,diff:"medium",fact:"'What I Got' by Sublime — released posthumously in 1996."},
+  {cat:"Music Round",icon:"🎵",type:"lyrics",lyric:"Red red wine, goes to my head\nMakes me forget that I\nStill need her so...",q:"Who made this song a massive reggae hit?",a:["UB40","Bob Marley","Jimmy Cliff","Steel Pulse"],correct:0,diff:"medium",fact:"Originally written by Neil Diamond in 1967. UB40's 1983 reggae version hit #1 worldwide."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What species of whale is this?",a:["Humpback whale","Blue whale","Orca","Sperm whale"],correct:0,diff:"medium",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/1/1c/Humpback_Whales_NOAA.jpg",fact:"Humpbacks are known for acrobatic breaching and complex songs that travel thousands of miles."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What San Diego landmark is shown here?",a:["Hotel del Coronado","USS Midway","Cabrillo Monument","Old Point Loma Lighthouse"],correct:3,diff:"hard",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/5/5d/Old_Point_Loma_Lighthouse_2013.jpg",fact:"The Old Point Loma Lighthouse was completed in 1855 — one of the oldest on the West Coast."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What is this colorful marine creature?",a:["Mantis shrimp","Pistol shrimp","Peacock crab","Rainbow lobster"],correct:0,diff:"hard",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/a/a7/Odontodactylus_scyllarus.jpg",fact:"Mantis shrimp punch with the force of a bullet and see 16 types of color. Humans have 3."},
+  {cat:"Photo Round",icon:"📸",type:"image",q:"What type of animal is this, commonly seen near San Diego shores?",a:["California sea lion","Harbor seal","Elephant seal","Steller sea lion"],correct:0,diff:"medium",imgUrl:"https://upload.wikimedia.org/wikipedia/commons/6/66/California_sea_lion_jan_2013.jpg",fact:"California sea lions are the ones barking on the docks — smart, social, often trained for military programs."},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"What is the highest-grossing film of all time (unadjusted for inflation)?",a:["Avatar","Avengers: Endgame","Titanic","Star Wars: The Force Awakens"],correct:0,diff:"medium",fact:"James Cameron's Avatar (~$2.9B globally). Cameron also directed Titanic at #3 all-time."},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"What film features the line 'You can't handle the truth!'?",a:["A Few Good Men","The Firm","Jerry Maguire","Philadelphia"],correct:0,diff:"medium",fact:"Jack Nicholson in A Few Good Men (1992). Tom Cruise never says 'I want the truth' — he says 'I want answers.'"},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"Which actor has won the most Academy Awards for acting?",a:["Meryl Streep","Katharine Hepburn","Jack Nicholson","Daniel Day-Lewis"],correct:1,diff:"hard",fact:"Katharine Hepburn won 4 Best Actress Oscars. Streep and Day-Lewis each have 3."},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"Which film is credited with inventing the modern summer blockbuster?",a:["Jaws","Star Wars","The Godfather","Close Encounters of the Third Kind"],correct:0,diff:"hard",fact:"Jaws (1975) was the first film to earn $100M at the US box office. Spielberg invented the blockbuster model."},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"What is the name of the fictional drug in Breaking Bad?",a:["Blue Sky","Crystal Clear","Ice Blue","White Lightning"],correct:0,diff:"medium",fact:"Walter White's blue meth was theoretically 99.1% pure. The show used blue-dyed cotton candy as the prop."},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"In which film does the character Tyler Durden appear?",a:["Fight Club","Se7en","The Game","12 Monkeys"],correct:0,diff:"medium",fact:"Fight Club (1999). Brad Pitt's Tyler Durden is actually a dissociative identity of Edward Norton's narrator."},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"Which streaming service produced Squid Game?",a:["Netflix","HBO","Disney+","Hulu"],correct:0,diff:"medium",fact:"Squid Game became Netflix's most-watched series ever — 111 million households in its first 28 days."},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"What movie introduced 'bullet time' slow-motion photography?",a:["The Matrix","Face/Off","Mission: Impossible","Blade"],correct:0,diff:"medium",fact:"The Wachowskis used 120 cameras in a ring for The Matrix (1999). Changed action filmmaking forever."},
+  {cat:"Movies & TV",icon:"🎬",type:"standard",q:"What show's finale was described as 'a statement about the banality of evil'?",a:["The Sopranos","Breaking Bad","Mad Men","The Wire"],correct:0,diff:"hard",fact:"David Chase never confirmed what happens after the cut to black. Entirely intentional — still debated."},
+];
+
+const CATS=[...new Set(TRIVIA_Q.map(q=>q.cat))];
+const ICONS={};TRIVIA_Q.forEach(q=>ICONS[q.cat]=q.icon);
+
+// ── STATE ────────────────────────────────────────────────────────
+let myName='', myRole='', roomCode='', roomRef=null, roomListener=null;
+let selCats=new Set(CATS), selDiff='mixed', qCount=10;
+let activeRoundTypes=new Set(['trivia','mlt','wsi']);
+let localStreak=0, myAnswered=false;
+let currentGameState=null;
+
+// ── UI HELPERS ───────────────────────────────────────────────────
+window.showScreen = function(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function shuffle(arr){return[...arr].sort(()=>Math.random()-.5);}
+function randCode(){return Math.random().toString(36).substring(2,6).toUpperCase();}
+
+// ── SETUP CONTROLS ───────────────────────────────────────────────
+window.toggleRT=function(el){
+  const rt=el.dataset.rt;
+  if(activeRoundTypes.has(rt)){if(activeRoundTypes.size<=1)return;activeRoundTypes.delete(rt);el.classList.remove('sel');}
+  else{activeRoundTypes.add(rt);el.classList.add('sel');}
+  document.getElementById('trivia-options').style.display=activeRoundTypes.has('trivia')?'block':'none';
+}
+window.setDiff=function(el){document.querySelectorAll('#diff-row .pill').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');selDiff=el.dataset.v;}
+window.setCnt=function(el){document.querySelectorAll('#cnt-row .pill').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');qCount=parseInt(el.dataset.v);}
+
+function initCats(){
+  const g=document.getElementById('cat-grid');g.innerHTML='';
+  CATS.forEach(cat=>{
+    const d=document.createElement('div');d.className='cat-card sel';
+    d.innerHTML=`<div class="ci">${ICONS[cat]}</div><div class="cl">${cat}</div>`;
+    d.onclick=()=>{selCats.has(cat)?(selCats.size>1&&(selCats.delete(cat),d.classList.remove('sel'))):(selCats.add(cat),d.classList.add('sel'))};
+    g.appendChild(d);
+  });
+}
+
+// ── CREATE ROOM ──────────────────────────────────────────────────
+window.createRoom = async function(){
+  const name=document.getElementById('host-name').value.trim();
+  if(!name){alert('Enter your name first!');return;}
+  myName=name;myRole='host';
+  showScreen('s-ai');
+  document.getElementById('ai-msg').textContent='Building your game...';
+
+  // build game queue
+  let triviaPool=[];
+  if(activeRoundTypes.has('trivia')){
+    triviaPool=TRIVIA_Q.filter(q=>selCats.has(q.cat));
+    if(selDiff!=='mixed')triviaPool=triviaPool.filter(q=>q.diff===selDiff);
+    triviaPool=shuffle(triviaPool).slice(0,qCount);
+  }
+
+  const roundOrder=[];
+  if(activeRoundTypes.has('trivia'))triviaPool.forEach(q=>roundOrder.push({kind:'trivia',q}));
+  if(activeRoundTypes.has('mlt')){
+    const count=Math.max(1,Math.floor((triviaPool.length||5)/5));
+    shuffle(MLT_PROMPTS).slice(0,count).forEach(p=>roundOrder.push({kind:'mlt',prompt:p}));
+  }
+  if(activeRoundTypes.has('wsi')){
+    const count=Math.max(1,Math.floor((triviaPool.length||5)/6));
+    shuffle(WSI_PROMPTS).slice(0,count).forEach(p=>roundOrder.push({kind:'wsi',prompt:p}));
+  }
+  const gameQueue=shuffle(roundOrder);
+
+  // generate AI questions if needed
+  if(activeRoundTypes.has('trivia')&&triviaPool.length<qCount){
+    try{
+      const need=qCount-triviaPool.length;
+      document.getElementById('ai-msg').textContent=`Generating ${need} fresh questions...`;
+      const cats=[...selCats].filter(c=>c!=='Music Round'&&c!=='Photo Round');
+      const prompt=`Generate exactly ${need} trivia questions for adults 30s-40s who love bars, craft beer, reggae, wildlife, San Diego, space, and movies/TV. Challenging questions only. Return ONLY valid JSON array, no markdown. Each: {"cat":"Category","q":"Question","a":["Correct","Wrong1","Wrong2","Wrong3"],"correct":0,"diff":"medium or hard","fact":"1-2 sentence fact","type":"standard"}. Categories: ${cats.join(', ')}.`;
+      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+      const data=await res.json();
+      const text=data.content.map(i=>i.text||'').join('');
+      const fresh=JSON.parse(text.replace(/```json|```/g,'').trim()).map(q=>({...q,icon:ICONS[q.cat]||'❓'}));
+      fresh.forEach(q=>gameQueue.push({kind:'trivia',q}));
+    }catch(e){console.error('AI gen failed',e);}
+  }
+
+  roomCode=randCode();
+  roomRef=ref(db,`rooms/${roomCode}`);
+
+  // serialize queue (Firebase can't store complex objects with methods)
+  const serializedQueue=gameQueue.map((item,i)=>{
+    if(item.kind==='trivia'){
+      // shuffle answers for display, store shuffled order
+      const shuffled=shuffle(item.q.a.map((t,idx)=>({t,ok:idx===item.q.correct})));
+      return {kind:'trivia',idx:i,q:{...item.q,shuffledA:shuffled.map(s=>s.t),correctText:item.q.a[item.q.correct]}};
+    }
+    return {kind:item.kind,idx:i,prompt:item.prompt||''};
+  });
+
+  await set(roomRef,{
+    host:name,
+    code:roomCode,
+    status:'lobby',
+    players:{[name]:{name,score:0,role:'host',joined:Date.now()}},
+    queue:serializedQueue,
+    currentIdx:0,
+    currentPhase:'lobby',
+  });
+
+  listenToRoom();
+  document.getElementById('lobby-code').textContent=roomCode;
+  showScreen('s-lobby-host');
+}
+
+// ── JOIN ROOM ────────────────────────────────────────────────────
+window.joinGame = async function(){
+  const name=document.getElementById('join-name').value.trim();
+  const code=document.getElementById('join-code').value.trim().toUpperCase();
+  const errEl=document.getElementById('join-error');
+  if(!name||!code){errEl.textContent='Enter your name and a room code.';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  const snap=await get(ref(db,`rooms/${code}`));
+  if(!snap.exists()){errEl.textContent='Room not found. Check the code.';errEl.style.display='block';return;}
+  const room=snap.val();
+  if(room.status==='ended'){errEl.textContent='That game has already ended.';errEl.style.display='block';return;}
+  myName=name;myRole='player';roomCode=code;
+  roomRef=ref(db,`rooms/${code}`);
+  await update(ref(db,`rooms/${code}/players/${name}`),{name,score:0,role:'player',joined:Date.now()});
+  listenToRoom();
+  document.getElementById('player-room-code').textContent=code;
+  showScreen('s-lobby-player');
+}
+
+// ── LISTEN TO ROOM ───────────────────────────────────────────────
+function listenToRoom(){
+  if(roomListener)roomListener();
+  roomListener=onValue(roomRef,snap=>{
+    if(!snap.exists())return;
+    const room=snap.val();
+    currentGameState=room;
+    handleRoomUpdate(room);
+  });
+}
+
+function handleRoomUpdate(room){
+  const players=Object.values(room.players||{}).sort((a,b)=>b.score-a.score);
+  const playerNames=Object.keys(room.players||{});
+
+  // update lobby
+  if(room.status==='lobby'){
+    renderLobbyPlayers(players);
+    if(myRole==='host'){
+      const startBtn=document.getElementById('start-btn');
+      if(playerNames.length>=2){startBtn.disabled=false;startBtn.textContent=`Start Game (${playerNames.length} players) →`;}
+      else{startBtn.disabled=true;startBtn.textContent='Waiting for players...';}
+    }
+    return;
+  }
+
+  if(room.status==='ended'){showResultsScreen(room);return;}
+  if(room.status==='playing'){handleGameUpdate(room);}
+}
+
+function renderLobbyPlayers(players){
+  const listId=myRole==='host'?'lobby-players':'lobby-player-list';
+  document.getElementById(listId).innerHTML=players.map((p,i)=>`
+    <div class="player-entry">
+      <div style="display:flex;align-items:center">
+        <div class="player-dot"></div>
+        <span style="font-weight:700;font-size:14px;color:${TC[i%TC.length]}">${p.name}</span>
+        ${p.role==='host'?'<span style="font-size:11px;color:var(--muted);margin-left:8px;font-weight:700">HOST</span>':''}
+      </div>
+    </div>`).join('');
+}
+
+// ── HOST START ───────────────────────────────────────────────────
+window.hostStartGame = async function(){
+  await update(roomRef,{status:'playing',currentIdx:0,currentPhase:'question',answers:{},votes:{}});
+}
+
+// ── GAME UPDATE HANDLER ──────────────────────────────────────────
+function handleGameUpdate(room){
+  const idx=room.currentIdx||0;
+  const queue=room.queue||[];
+  if(idx>=queue.length){endGame(room);return;}
+  const item=queue[idx];
+  const players=Object.values(room.players||{});
+  const playerNames=players.map(p=>p.name);
+
+  renderScoreBar(players,room.currentTurn);
+
+  if(item.kind==='trivia'){
+    if(room.currentPhase==='question'){
+      renderTriviaQuestion(item,idx,queue.length,room,playerNames);
+    } else if(room.currentPhase==='reveal'){
+      renderTriviaReveal(item,room,playerNames);
+    }
+  } else if(item.kind==='mlt'){
+    renderMLT(item,room,playerNames,idx,queue.length);
+  } else if(item.kind==='wsi'){
+    if(room.currentPhase==='wsi-collect'){
+      renderWSICollect(item,room,playerNames);
+    } else if(room.currentPhase==='wsi-guess'){
+      renderWSIGuessing(item,room,playerNames);
+    }
+  }
+}
+
+// ── SCORE BAR ────────────────────────────────────────────────────
+function renderScoreBar(players,activeName){
+  const wrap=document.getElementById('score-bar-wrap');
+  if(players.length<=1){wrap.innerHTML='';return;}
+  const sorted=[...players].sort((a,b)=>a.name.localeCompare(b.name));
+  wrap.innerHTML=`<div class="score-bar">${sorted.map((p,i)=>`
+    <div class="score-team${p.name===activeName?' active':''}">
+      <div class="sname">${p.name}</div>
+      <div class="spts">${p.score||0}</div>
+    </div>`).join('')}</div>`;
+}
+
+// ── TRIVIA ───────────────────────────────────────────────────────
+function renderTriviaQuestion(item,idx,total,room,playerNames){
+  showScreen('s-game');
+  const q=item.q;
+  myAnswered=!!(room.answers&&room.answers[myName]);
+  document.getElementById('pfill').style.width=`${(idx/total)*100}%`;
+  document.getElementById('qnum').textContent=`${idx+1} / ${total}`;
+  document.getElementById('qcat').textContent=`${q.icon||''} ${q.cat}`;
+  document.getElementById('fact-area').innerHTML='';
+
+  const ci=playerNames.indexOf(room.currentTurn||playerNames[0]);
+  const tbw=document.getElementById('turn-badge-wrap');
+  if(playerNames.length>1&&room.currentTurn){
+    tbw.innerHTML=`<span class="turn-badge" style="background:${TC[Math.max(0,ci)%TC.length]};color:#0f0f0f">${room.currentTurn}</span>`;
+  } else tbw.innerHTML='';
+
+  // streak
+  const sb=document.getElementById('streak-badge');
+  if(localStreak>=2){sb.style.display='inline-flex';document.getElementById('streak-num').textContent=localStreak;sb.classList.toggle('hot',localStreak>=3);}
+  else sb.style.display='none';
+
+  let body='';
+  if(q.cat==='Music Round')body+=`<span class="round-type-badge rt-music">🎵 Music</span>`;
+  else if(q.cat==='Photo Round')body+=`<span class="round-type-badge rt-photo">📸 Photo</span>`;
+  else body+=`<span class="round-type-badge rt-trivia">🧠 Trivia</span>`;
+
+  if(q.type==='image'&&q.imgUrl)body+=`<div class="img-card"><img src="${q.imgUrl}" loading="lazy" onerror="this.parentElement.style.display='none'"/></div>`;
+  else if(q.type==='lyrics'&&q.lyric)body+=`<div class="lyrics-card"><span class="lbl">🎵 Lyrics</span>${q.lyric.replace(/\n/g,'<br>')}</div>`;
+  body+=`<div style="font-size:19px;font-weight:800;line-height:1.4;margin-bottom:1.1rem;letter-spacing:-.4px">${q.q}</div>`;
+  document.getElementById('qbody').innerHTML=body;
+
+  const answers=room.answers||{};
+  const myAns=answers[myName];
+  const grid=document.getElementById('ans-grid');grid.innerHTML='';
+  (q.shuffledA||q.a).forEach((ans,i)=>{
+    const b=document.createElement('button');b.className='ans-btn';
+    if(myAns===ans)b.classList.add('selected');
+    if(myAnswered)b.disabled=true;
+    b.innerHTML=`<span class="ans-letter">${LETTERS[i]}</span><span>${ans}</span>`;
+    b.onclick=()=>submitTriviaAnswer(ans,q.correctText,b,grid,q.shuffledA||q.a);
+    grid.appendChild(b);
+  });
+
+  const nb=document.getElementById('next-btn');
+  const pm=document.getElementById('player-answered-msg');
+  if(myRole==='host'){
+    nb.textContent='Reveal Answers →';
+    nb.onclick=()=>hostReveal(q.correctText);
+    nb.style.display=myAnswered?'block':'none';
+    pm.style.display='none';
+  } else {
+    nb.style.display='none';
+    pm.style.display=myAnswered?'block':'none';
+  }
+}
+
+async function submitTriviaAnswer(ans,correctText,btn,grid,allAnswers){
+  if(myAnswered)return;
+  myAnswered=true;
+  await update(ref(db,`rooms/${roomCode}/answers/${myName}`),{answer:ans,correct:ans===correctText,ts:Date.now()});
+  Array.from(grid.children).forEach(b=>b.disabled=true);
+  btn.classList.add('selected');
+  const nb=document.getElementById('next-btn');
+  const pm=document.getElementById('player-answered-msg');
+  if(myRole==='host'){
+    nb.textContent='Reveal Answers →';
+    nb.onclick=()=>hostReveal(correctText);
+    nb.style.display='block';
+    pm.style.display='none';
+  } else {
+    nb.style.display='none';
+    pm.style.display='block';
+  }
+}
+
+async function hostReveal(correctText){
+  await update(roomRef,{currentPhase:'reveal'});
+}
+
+function renderTriviaReveal(item,room,playerNames){
+  showScreen('s-game');
+  const q=item.q;
+  const answers=room.answers||{};
+
+  const grid=document.getElementById('ans-grid');
+  Array.from(grid.children).forEach((b,i)=>{
+    const ansText=(q.shuffledA||q.a)[i];
+    b.disabled=true;b.className='ans-btn';
+    if(ansText===q.correctText)b.classList.add('correct');
+    else if(answers[myName]?.answer===ansText)b.classList.add('wrong');
+  });
+
+  // only update score once per reveal (guard with a flag on the item)
+  const revealKey=`scored_${room.currentIdx}`;
+  if(!window[revealKey]){
+    window[revealKey]=true;
+    const myResult=answers[myName];
+    if(myResult?.correct){
+      localStreak++;
+      const bonus=localStreak>=3?2:1;
+      const cur=room.players?.[myName]?.score||0;
+      update(ref(db,`rooms/${roomCode}/players/${myName}/score`),cur+bonus);
+    } else if(myResult){
+      localStreak=0;
+    }
+  }
+
+  let factHTML='<div class="fact-box">';
+  if(localStreak>=3)factHTML+=`<div style="color:var(--accent);font-size:12px;font-weight:800;margin-bottom:6px">🔥 ${localStreak} in a row — +2 pts</div>`;
+  if(q.fact)factHTML+=q.fact;
+  factHTML+='</div>';
+  document.getElementById('fact-area').innerHTML=factHTML;
+
+  const sb=document.getElementById('streak-badge');
+  if(localStreak>=2){sb.style.display='inline-flex';document.getElementById('streak-num').textContent=localStreak;sb.classList.toggle('hot',localStreak>=3);}
+  else sb.style.display='none';
+
+  const nb=document.getElementById('next-btn');
+  const pm=document.getElementById('player-answered-msg');
+  if(myRole==='host'){
+    nb.textContent='Next →';
+    nb.onclick=()=>hostAdvance();
+    nb.style.display='block';
+    pm.style.display='none';
+  } else {
+    nb.style.display='none';
+    pm.textContent='Waiting for host...';
+    pm.style.display='block';
+  }
+}
+
+window.hostNext=function(){hostAdvance();};
+
+async function hostAdvance(){
+  const room=currentGameState;
+  const idx=(room.currentIdx||0)+1;
+  const queue=room.queue||[];
+  if(idx>=queue.length){endGame(room);return;}
+  const nextItem=queue[idx];
+  const playerNames=Object.keys(room.players||{});
+  const currentTurnIdx=playerNames.indexOf(room.currentTurn||playerNames[0]);
+  const nextTurn=playerNames[(currentTurnIdx+1)%playerNames.length];
+
+  myAnswered=false;
+  let phase='question';
+  if(nextItem.kind==='mlt')phase='mlt';
+  else if(nextItem.kind==='wsi')phase='wsi-collect';
+
+  await update(roomRef,{currentIdx:idx,currentPhase:phase,answers:{},votes:{},wsiAnswers:{},currentTurn:nextTurn});
+}
+
+// ── MLT ──────────────────────────────────────────────────────────
+function renderMLT(item,room,playerNames,idx,total){
+  showScreen('s-mlt');
+  renderScoreBar(Object.values(room.players||{}).sort((a,b)=>b.score-a.score),room.currentTurn);
+  document.getElementById('mlt-progress').textContent=`${idx+1} / ${total}`;
+  const votes=room.votes||{};
+  const revealed=room.mltRevealed||false;
+  const myVote=votes[myName];
+
+  document.getElementById('mlt-inner').innerHTML=`
+    <div style="font-size:20px;font-weight:800;line-height:1.4;letter-spacing:-.4px;margin:1rem 0 1.5rem">
+      Who is most likely to...<br><span style="color:#a78bfa">${item.prompt.replace(/^most likely to /i,"")}?</span>
+    </div>
+    <div id="mlt-options">${playerNames.map((n,i)=>{
+      const voteCount=Object.values(votes).filter(v=>v===n).length;
+      const pct=revealed?Math.round((voteCount/Math.max(Object.keys(votes).length,1))*100):0;
+      return `<div class="mlt-option${myVote===n?' voted':''}" data-mlt-name="${n}" id="mlt-opt-${i}">
+        <span class="mlt-option-name" style="color:${TC[i%TC.length]}">${n}</span>
+        <div class="mlt-bar-wrap"><div class="mlt-bar" id="mlt-bar-${i}" style="width:${pct}%;background:${TC[i%TC.length]}"></div></div>
+        <span class="mlt-count">${revealed?voteCount:''}</span>
+      </div>`;}).join('')}
+    </div>`;
+
+  const revealBtn=document.getElementById('mlt-reveal-btn');
+  const nextBtn=document.getElementById('mlt-next-btn');
+  const votedMsg=document.getElementById('mlt-voted-msg');
+  revealBtn.style.display=myRole==='host'&&!revealed?'block':'none';
+  revealBtn.onclick=()=>hostMLTReveal();
+  nextBtn.style.display=myRole==='host'&&revealed?'block':'none';
+  nextBtn.onclick=()=>hostMLTNext();
+  votedMsg.style.display=myRole!=='host'&&myVote?'block':'none';
+
+  // wire up click handlers via event delegation
+  const optsEl=document.getElementById('mlt-options');
+  if(optsEl){
+    optsEl.onclick=function(e){
+      const opt=e.target.closest('[data-mlt-name]');
+      if(!opt||revealed)return;
+      castMLTVote(opt.dataset.mltName,opt);
+    };
+  }
+
+  if(revealed){
+    setTimeout(()=>{
+      playerNames.forEach((_,i)=>{
+        const bar=document.getElementById(`mlt-bar-${i}`);
+        if(bar){const voteCount=Object.values(votes).filter(v=>v===playerNames[i]).length;
+        const pct=Math.round((voteCount/Math.max(Object.keys(votes).length,1))*100);
+        bar.style.width=pct+'%';}
+      });
+    },100);
+  }
+}
+
+window.castMLTVote=async function(name,el){
+  const room=currentGameState;
+  if(room.mltRevealed)return;
+  // optimistic UI update
+  document.querySelectorAll('[data-mlt-name]').forEach(o=>{
+    o.classList.toggle('voted', o.dataset.mltName===name);
+  });
+  if(myRole!=='host'){
+    document.getElementById('mlt-voted-msg').style.display='block';
+  }
+  await update(ref(db,`rooms/${roomCode}/votes/${myName}`),name);
+}
+
+window.hostMLTReveal=async function(){
+  const room=currentGameState;
+  const votes=room.votes||{};
+  const playerNames=Object.keys(room.players||{});
+  // find winner
+  const counts={};playerNames.forEach(n=>counts[n]=0);
+  Object.values(votes).forEach(v=>{if(counts[v]!==undefined)counts[v]++;});
+  const winner=playerNames.reduce((a,b)=>counts[a]>=counts[b]?a:b);
+  const winnerScore=(room.players[winner]?.score||0)+2;
+  await update(ref(db,`rooms/${roomCode}/players/${winner}/score`),winnerScore);
+  await update(roomRef,{mltRevealed:true});
+}
+
+window.hostMLTNext=async function(){await hostAdvance();}
+
+// ── WSI ──────────────────────────────────────────────────────────
+function renderWSICollect(item,room,playerNames){
+  const wsiAnswers=room.wsiAnswers||{};
+  const mySubmitted=!!wsiAnswers[myName];
+
+  showScreen('s-wsi-input');
+  document.getElementById('wsi-my-prompt').textContent=item.prompt;
+
+  if(mySubmitted){
+    document.getElementById('wsi-my-input').style.display='none';
+    document.querySelector('#s-wsi-input .btn').style.display='none';
+    document.getElementById('wsi-submit-msg').style.display='block';
+    const remaining=playerNames.filter(n=>!wsiAnswers[n]).length;
+    document.querySelector('#wsi-submit-msg p').textContent=`Answer submitted! ${remaining} player${remaining!==1?'s':''} still typing...`;
+  }
+
+  // host: show "start guessing" button when all answered
+  if(myRole==='host'&&Object.keys(wsiAnswers).length>=playerNames.length){
+    const btn=document.createElement('button');
+    btn.className='btn primary';btn.textContent='Everyone\'s in — start guessing →';btn.style.marginTop='1rem';
+    btn.onclick=async()=>{
+      const answers=Object.values(wsiAnswers);
+      const shuffled=shuffle(answers);
+      await update(roomRef,{currentPhase:'wsi-guess',wsiShuffled:shuffled,wsiGuessIdx:0,wsiGuesses:{}});
+    };
+    const existing=document.getElementById('wsi-start-guess');
+    if(!existing){btn.id='wsi-start-guess';document.getElementById('s-wsi-input').querySelector('div').appendChild(btn);}
+  }
+}
+
+window.submitMyWSIAnswer=async function(){
+  const val=document.getElementById('wsi-my-input').value.trim();
+  if(!val)return;
+  await update(ref(db,`rooms/${roomCode}/wsiAnswers/${myName}`),{author:myName,text:val});
+  document.getElementById('wsi-my-input').style.display='none';
+  document.querySelector('#s-wsi-input .btn.primary').style.display='none';
+  document.getElementById('wsi-submit-msg').style.display='block';
+}
+
+function renderWSIGuessing(item,room,playerNames){
+  showScreen('s-wsi-guess');
+  const shuffled=room.wsiShuffled||[];
+  const gIdx=room.wsiGuessIdx||0;
+  const guesses=room.wsiGuesses||{};
+  const revealed=room.wsiRevealedIdx!==undefined&&room.wsiRevealedIdx>=gIdx;
+
+  if(gIdx>=shuffled.length){
+    if(myRole==='host')hostWSIDone();
+    return;
+  }
+
+  const current=shuffled[gIdx];
+  const myGuess=guesses[myName];
+  document.getElementById('wsi-guess-prompt').textContent=item.prompt;
+
+  document.getElementById('wsi-guess-inner').innerHTML=`
+    <div style="background:var(--surface2);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1.25rem;border-left:3px solid #fbbf24">
+      <div style="font-size:11px;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Someone wrote...</div>
+      <div style="font-size:17px;font-weight:700;line-height:1.5">"${current.text}"</div>
+      ${revealed?`<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:8px">Written by ${current.author}</div>`:''}
+    </div>
+    ${revealed?'':playerNames.map((n,i)=>`
+      <div class="wsi-answer-card${myGuess===n?' correct-reveal':''}" onclick="submitWSIGuess('${n}')" id="wsi-gopt-${i}">
+        <div class="wsi-answer-text" style="color:${TC[i%TC.length]}">${n}</div>
+      </div>`).join('')}`;
+
+  const wsiNxt=document.getElementById('wsi-next-btn');
+  const wsiDone=document.getElementById('wsi-done-btn');
+  const wsiWait=document.getElementById('wsi-waiting-msg');
+
+  if(!revealed){
+    wsiNxt.style.display=myRole==='host'&&myGuess?'block':'none';
+    wsiNxt.textContent='Reveal Answer →';
+    wsiNxt.onclick=()=>hostWSIReveal(current.author,guesses);
+    wsiDone.style.display='none';
+    wsiWait.style.display=myRole!=='host'&&myGuess?'block':'none';
+  } else {
+    if(gIdx<shuffled.length-1){
+      wsiNxt.style.display=myRole==='host'?'block':'none';
+      wsiNxt.textContent='Next Answer →';
+      wsiNxt.onclick=()=>hostWSINext();
+      wsiDone.style.display='none';
+    } else {
+      wsiNxt.style.display='none';
+      wsiDone.style.display=myRole==='host'?'block':'none';
+      wsiDone.onclick=()=>hostWSIDone();
+    }
+    wsiWait.style.display=myRole!=='host'?'block':'none';
+    wsiWait.textContent='Waiting for host...';
+  }
+}
+
+window.submitWSIGuess=async function(guessed){
+  if(currentGameState?.wsiRevealedIdx>=currentGameState?.wsiGuessIdx)return;
+  await update(ref(db,`rooms/${roomCode}/wsiGuesses/${myName}`),guessed);
+  document.getElementById('wsi-waiting-msg').style.display='block';
+}
+
+window.hostWSIReveal=async function(actualAuthor,guesses){
+  const room=currentGameState;
+  const playerNames=Object.keys(room.players||{});
+  // award points for correct guesses
+  for(const [player,guess] of Object.entries(guesses)){
+    if(guess===actualAuthor&&player!==actualAuthor){
+      const cur=room.players[player]?.score||0;
+      await update(ref(db,`rooms/${roomCode}/players/${player}/score`),cur+1);
+    }
+  }
+  await update(roomRef,{wsiRevealedIdx:room.wsiGuessIdx||0});
+}
+
+window.hostWSINext=async function(){
+  const room=currentGameState;
+  await update(roomRef,{wsiGuessIdx:(room.wsiGuessIdx||0)+1,wsiGuesses:{},wsiRevealedIdx:-1});
+}
+
+window.hostWSIDone=async function(){await hostAdvance();}
+
+// ── END GAME ─────────────────────────────────────────────────────
+async function endGame(room){
+  await update(roomRef,{status:'ended'});
+}
+
+function showResultsScreen(room){
+  showScreen('s-results');
+  const players=Object.values(room.players||{}).sort((a,b)=>b.score-a.score);
+  const max=players[0]?.score||1;
+  const ranks=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣'];
+  document.getElementById('leaderboard').innerHTML=`
+    <span class="label" style="margin-top:0">Final Scores</span>
+    <div class="podium">
+      ${players.map((p,i)=>`
+        <div class="podium-row${i===0?' first':''}">
+          <span class="podium-rank">${ranks[i]||''}</span>
+          <span class="podium-name" style="${i===0?`color:${TC[i%TC.length]}`:'color:var(--text)'}">${p.name}</span>
+          <span class="podium-score">${p.score||0} pts</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── LEAVE ────────────────────────────────────────────────────────
+window.leaveRoom=async function(){
+  if(roomListener){roomListener();roomListener=null;}
+  if(roomRef&&myRole==='host'){
+    await update(roomRef,{status:'ended'});
+  } else if(roomRef&&myName){
+    await remove(ref(db,`rooms/${roomCode}/players/${myName}`));
+  }
+  roomRef=null;roomCode='';myName='';myRole='';localStreak=0;myAnswered=false;
+  showScreen('s-entry');
+}
+
+initCats();
+
+// ── WIRE ALL BUTTONS ─────────────────────────────────────────────
+// Called after module init so all functions are in scope
+function wireButtons(){
+  const wire=(id,fn)=>{const el=document.getElementById(id);if(el)el.onclick=fn;};
+  wire('mlt-reveal-btn', ()=>hostMLTReveal());
+  wire('mlt-next-btn', ()=>hostMLTNext());
+  wire('wsi-next-btn', ()=>hostWSINext());
+  wire('wsi-done-btn', ()=>hostWSIDone());
+  wire('start-btn', ()=>hostStartGame());
+  wire('wsi-submit-btn', ()=>submitMyWSIAnswer());
+
+  // nav buttons
+  document.querySelectorAll('[data-goto]').forEach(el=>{
+    el.onclick=()=>showScreen(el.dataset.goto);
+  });
+  document.querySelectorAll('[data-leave]').forEach(el=>{
+    el.onclick=()=>leaveRoom();
+  });
+  document.querySelectorAll('[data-create]').forEach(el=>{
+    el.onclick=()=>createRoom();
+  });
+  document.querySelectorAll('[data-join]').forEach(el=>{
+    el.onclick=()=>joinGame();
+  });
+}
+wireButtons();
+</script>
+</body>
+</html>
