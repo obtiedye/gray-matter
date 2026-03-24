@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gray Matter"/>
 <meta name="theme-color" content="#0f0f0f"/>
-<title>Gray Matter v4</title>
+<title>Gray Matter v6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -629,7 +629,7 @@ function handleGameUpdate(room){
   const players=Object.values(room.players||{});
   const playerNames=players.map(p=>p.name);
 
-  renderScoreBar(players,room.currentTurn);
+  renderScoreBar(players);
 
   if(item.kind==='trivia'){
     if(room.currentPhase==='question'){
@@ -649,12 +649,12 @@ function handleGameUpdate(room){
 }
 
 // ── SCORE BAR ────────────────────────────────────────────────────
-function renderScoreBar(players,activeName){
+function renderScoreBar(players){
   const wrap=document.getElementById('score-bar-wrap');
   if(players.length<=1){wrap.innerHTML='';return;}
-  const sorted=[...players].sort((a,b)=>a.name.localeCompare(b.name));
+  const sorted=[...players].sort((a,b)=>(b.score||0)-(a.score||0));
   wrap.innerHTML=`<div class="score-bar">${sorted.map((p,i)=>`
-    <div class="score-team${p.name===activeName?' active':''}">
+    <div class="score-team${i===0?' active':''}">
       <div class="sname">${p.name}</div>
       <div class="spts">${p.score||0}</div>
     </div>`).join('')}</div>`;
@@ -670,11 +670,8 @@ function renderTriviaQuestion(item,idx,total,room,playerNames){
   document.getElementById('qcat').textContent=`${q.icon||''} ${q.cat}`;
   document.getElementById('fact-area').innerHTML='';
 
-  const ci=playerNames.indexOf(room.currentTurn||playerNames[0]);
-  const tbw=document.getElementById('turn-badge-wrap');
-  if(playerNames.length>1&&room.currentTurn){
-    tbw.innerHTML=`<span class="turn-badge" style="background:${TC[Math.max(0,ci)%TC.length]};color:#0f0f0f">${room.currentTurn}</span>`;
-  } else tbw.innerHTML='';
+  // no turn indicator for trivia — everyone answers simultaneously
+  document.getElementById('turn-badge-wrap').innerHTML='';
 
   // streak
   const sb=document.getElementById('streak-badge');
@@ -767,9 +764,19 @@ function renderTriviaReveal(item,room,playerNames){
     }
   }
 
+  // build who got it right/wrong summary
+  const answerSummary=playerNames.map(name=>{
+    const r=answers[name];
+    if(!r)return `<span style="color:var(--muted)">⬜ ${name}</span>`;
+    return r.correct
+      ? `<span style="color:var(--green);font-weight:700">✓ ${name}</span>`
+      : `<span style="color:var(--red)">✗ ${name}</span>`;
+  }).join('<span style="color:var(--border);margin:0 6px">·</span>');
+
   let factHTML='<div class="fact-box">';
   if(localStreak>=3)factHTML+=`<div style="color:var(--accent);font-size:12px;font-weight:800;margin-bottom:6px">🔥 ${localStreak} in a row — +2 pts</div>`;
-  if(q.fact)factHTML+=q.fact;
+  factHTML+=`<div style="font-size:13px;margin-bottom:${q.fact?'10px':'0'};line-height:1.8">${answerSummary}</div>`;
+  if(q.fact)factHTML+=`<div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px">${q.fact}</div>`;
   factHTML+='</div>';
   document.getElementById('fact-area').innerHTML=factHTML;
 
@@ -799,22 +806,18 @@ async function hostAdvance(){
   const queue=room.queue||[];
   if(idx>=queue.length){endGame(room);return;}
   const nextItem=queue[idx];
-  const playerNames=Object.keys(room.players||{});
-  const currentTurnIdx=playerNames.indexOf(room.currentTurn||playerNames[0]);
-  const nextTurn=playerNames[(currentTurnIdx+1)%playerNames.length];
-
   myAnswered=false;
   let phase='question';
   if(nextItem.kind==='mlt')phase='mlt';
   else if(nextItem.kind==='wsi')phase='wsi-collect';
 
-  await update(roomRef,{currentIdx:idx,currentPhase:phase,answers:{},votes:{},wsiAnswers:{},currentTurn:nextTurn});
+  await update(roomRef,{currentIdx:idx,currentPhase:phase,answers:{},votes:{},wsiAnswers:{}});
 }
 
 // ── MLT ──────────────────────────────────────────────────────────
 function renderMLT(item,room,playerNames,idx,total){
   showScreen('s-mlt');
-  renderScoreBar(Object.values(room.players||{}).sort((a,b)=>b.score-a.score),room.currentTurn);
+  renderScoreBar(Object.values(room.players||{}));
   document.getElementById('mlt-progress').textContent=`${idx+1} / ${total}`;
   const votes=room.votes||{};
   const revealed=room.mltRevealed||false;
