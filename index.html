@@ -761,7 +761,7 @@ function renderTriviaReveal(item,room,playerNames){
       localStreak++;
       const bonus=localStreak>=3?2:1;
       const cur=room.players?.[myName]?.score||0;
-      update(ref(db,`rooms/${roomCode}/players/${myName}/score`),cur+bonus);
+      set(ref(db,`rooms/${roomCode}/players/${myName}/score`),cur+bonus);
     } else if(myResult){
       localStreak=0;
     }
@@ -875,7 +875,7 @@ window.castMLTVote=async function(name,el){
   if(myRole!=='host'){
     document.getElementById('mlt-voted-msg').style.display='block';
   }
-  await update(ref(db,`rooms/${roomCode}/votes/${myName}`),name);
+  await set(ref(db,`rooms/${roomCode}/votes/${myName}`),name);
 }
 
 window.hostMLTReveal=async function(){
@@ -887,7 +887,7 @@ window.hostMLTReveal=async function(){
   Object.values(votes).forEach(v=>{if(counts[v]!==undefined)counts[v]++;});
   const winner=playerNames.reduce((a,b)=>counts[a]>=counts[b]?a:b);
   const winnerScore=(room.players[winner]?.score||0)+2;
-  await update(ref(db,`rooms/${roomCode}/players/${winner}/score`),winnerScore);
+  await set(ref(db,`rooms/${roomCode}/players/${winner}/score`),winnerScore);
   await update(roomRef,{mltRevealed:true});
 }
 
@@ -926,7 +926,7 @@ function renderWSICollect(item,room,playerNames){
 window.submitMyWSIAnswer=async function(){
   const val=document.getElementById('wsi-my-input').value.trim();
   if(!val)return;
-  await update(ref(db,`rooms/${roomCode}/wsiAnswers/${myName}`),{author:myName,text:val});
+  await set(ref(db,`rooms/${roomCode}/wsiAnswers/${myName}`),{author:myName,text:val});
   document.getElementById('wsi-my-input').style.display='none';
   document.querySelector('#s-wsi-input .btn.primary').style.display='none';
   document.getElementById('wsi-submit-msg').style.display='block';
@@ -987,7 +987,7 @@ function renderWSIGuessing(item,room,playerNames){
 
 window.submitWSIGuess=async function(guessed){
   if(currentGameState?.wsiRevealedIdx>=currentGameState?.wsiGuessIdx)return;
-  await update(ref(db,`rooms/${roomCode}/wsiGuesses/${myName}`),guessed);
+  await set(ref(db,`rooms/${roomCode}/wsiGuesses/${myName}`),guessed);
   document.getElementById('wsi-waiting-msg').style.display='block';
 }
 
@@ -998,7 +998,7 @@ window.hostWSIReveal=async function(actualAuthor,guesses){
   for(const [player,guess] of Object.entries(guesses)){
     if(guess===actualAuthor&&player!==actualAuthor){
       const cur=room.players[player]?.score||0;
-      await update(ref(db,`rooms/${roomCode}/players/${player}/score`),cur+1);
+      await set(ref(db,`rooms/${roomCode}/players/${player}/score`),cur+1);
     }
   }
   await update(roomRef,{wsiRevealedIdx:room.wsiGuessIdx||0});
